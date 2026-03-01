@@ -1,0 +1,28 @@
+--------------------------------------------------------------
+Verification summary:
+
+Query not event(LeakedAK(pubAK_4)) is false.
+
+Query not event(LeakedLTK(pubLTK_3)) is false.
+
+Query not event(LeakedEK(pubEK_3)) is false.
+
+Query attacker(privAK[]) ==> event(LeakedAK(pk(privAK[]))) is true.
+
+Query attacker(privAK[]) ==> event(LeakedAK(pubAK_4)) is true.
+
+Query event(ClientFinished(pk(privAK[]),psk_2,cr_2,sr_2,offer_2,mode_2,kc_4,ks_4,ems_4,rms_2)) && attacker(privAK[]) ==> event(LeakedAK(pk(privAK[]))) is true.
+
+Query not event(ClientComp(ID_S_3,pubLTK_3,psk_2,offer_2,mode_2,kc_4,ks_4,ems_4,rms_2,cr_2,sr_2,pubEK_3,dev_state)) is false.
+
+Query not event(PreServerComp(ID_S_3,pubLTK_3,psk_2,offer_2,mode_2,kc_4,ks_4,ems_4,cr_2,sr_2,pubEK_3,dev_state)) is false.
+
+Query inj-event(ClientComp(ID_S_3,pubLTK_3,psk_2,offer_2,mode_2,kc_4,ks_4,ems_4,rms_2,cr_2,sr_2,pubEK_3,dev_state)) ==> inj-event(PreServerComp(ID_S_3,pubLTK_3,psk_2,offer_2,mode_2,kc_4,ks_4,ems_4,cr_2,sr_2,pubEK_3,dev_state)) || event(LeakedEK(pubEK_3)) is true.
+
+Query inj-event(ClientComp(ID_S_3,pubLTK_3,psk_2,offer_2,mode_2,kc_4,ks_4,ems_4,rms_2,cr_2,sr_2,pubEK_3,dev_state)) ==> inj-event(PreServerComp(ID_S_3,pubLTK_3,psk_2,offer_2,mode_2,kc_4,ks_4,ems_4,cr_2,sr_2,pubEK_3,dev_state)) || event(LeakedLTK(pubLTK_3)) is true.
+
+Query inj-event(ClientComp(ID_S_3,pubLTK_3,psk_2,offer_2,mode_2,kc_4,ks_4,ems_4,rms_2,cr_2,sr_2,pubEK_3,dev_state)) ==> inj-event(PreServerComp(ID_S_3,pubLTK_3,psk_2,offer_2,mode_2,kc_4,ks_4,ems_4,cr_2,sr_2,pubEK_3,dev_state)) || event(LeakedAK(pubAK_4)) is true.
+
+Query inj-event(ClientComp(ID_S_3,pubLTK_3,psk_2,offer_2,mode_2,kc_4,ks_4,ems_4,rms_2,cr_2,sr_2,pubEK_3,dev_state)) ==> inj-event(PreServerComp(ID_S_3,pubLTK_3,psk_2,offer_2,mode_2,kc_4,ks_4,ems_4,cr_2,sr_2,pubEK_3,dev_state)) is false.
+
+--------------------------------------------------------------
