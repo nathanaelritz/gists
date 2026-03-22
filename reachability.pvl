@@ -1,0 +1,144 @@
+(*******************************************************************************
+ * FULL SYSTEMATIC EVALUATION OF REACHABILITY AND AGREEMENT
+ * Library: systematic_health_check.pvl
+ *
+ * This suite evaluates every event defined in Sardar's tls-lib-simple.pvl.
+ * Chronological segmentation follows the TLS 1.3 handshake state machine.
+ *
+****************************************************)
+
+(* SEGMENT 1: INITIAL NEGOTIATION (UNAUTHENTICATED)
+   Transcript State: log_SH = (ClientHello, ServerHello)
+   Action: Nonce exchange and Diffie-Hellman key share selection. *)
+
+(* Unary Reachability: Client Intent *)
+query cr:random, h:hash_alg; event(ClientOffersHash(cr, h)).
+query cr:random, k:kex_alg; event(ClientOffersKEX(cr, k)).
+query cr:random, e:ev_typ; event(ClientOffersEvType(cr, e)).
+
+(* Unary Reachability: Server Selection *)
+query cr:random, sr:random, h:hash_alg; event(ServerChoosesHash(cr, sr, h)).
+query cr:random, sr:random, k:kex_alg; event(ServerChoosesKEX(cr, sr, k)).
+query cr:random, sr:random, t:tls_typ; event(ServerChoosesATLS(cr, sr, t)).
+query cr:random, sr:random, e:ev_typ; event(ServerChoosesEvType(cr, sr, e)).
+
+(* Binary Agreement: DH Session Establishment *)
+query idS:identity, idXS:identity, gxy:bitstring; 
+    event(ServerID(idS, gxy)) && event(ClientID(idXS, gxy)).
+
+
+(* SEGMENT 2: SERVER EVIDENCE GENERATION
+   Transcript State: log_SH
+   Action: Attester (Server) generates Evidence before transmission. *)
+
+query q:bitstring; event(Sent(q)).
+query q:bitstring, k:pubkey; event(SentWithPubEK(q, k)).
+query d:bitstring; event(SentRdata(d)).
+query log:bitstring; event(Conveyed(log)).
+
+query id:identity, ltk:pubkey, ak:pubkey, ek:pubkey, d:bitstring, q:bitstring;
+    event(ServerRA(id, ltk, ak, ek, d, q)).
+query ak:pubkey, ek:pubkey, d:bitstring; 
+    event(ServerRA2(ak, ek, d)).
+query ek:pubkey, d:bitstring, q:bitstring; 
+    event(ServerRAWithoutAK(ek, d, q)).
+
+
+(* SEGMENT 3: CLIENT PARSING & APPRAISAL (THE CRASH POINT)
+   Transcript State: log_CRT = (log_SH, Certificate)
+   Action: Client attempts to parse the Server's CRT message and Evidence.
+   Note: In the uncorrected model these events are reachable (unary checks
+   return false), but only via attacker-constructed messages. *)
+
+query q:bitstring; event(Accepted(q)).
+query q:bitstring, k:pubkey; event(AcceptedWithPubEK(q, k)).
+query d:bitstring; event(AcceptedRdata(d)).
+query log:bitstring; event(Appraised(log)).
+query q:bitstring; event(ClientConn(q)).
+
+
+(* SEGMENT 4: REMOTE ATTESTATION (RA) AGREEMENT
+   Action: Cross-referencing generation (Server) vs acceptance (Client). *)
+
+query id:identity, ltk:pubkey, ak:pubkey, ek:pubkey, d:bitstring, q:bitstring;
+    event(ClientRA(ak, ek, d, q)) && event(ServerRA(id, ltk, ak, ek, d, q)).
+
+query ak:pubkey, ek:pubkey, d:bitstring;
+    event(ClientRA2(ak, ek, d)) && event(ServerRA2(ak, ek, d)).
+
+query ak:pubkey, ek:pubkey, d:bitstring, idc:identity;
+    event(ClientRA3(ak, ek, d, idc)) && event(ServerRA2(ak, ek, d)).
+
+query id:identity, ltk:pubkey, ak:pubkey, ek:pubkey, d:bitstring, q:bitstring;
+    event(ClientRANew(NULL_ID, NULL_pubkey, ak, ek, d, q)) && event(ServerRA(id, ltk, ak, ek, d, q)).
+
+query ek:pubkey, d:bitstring, q:bitstring;
+    event(ClientRAWithoutAK(ek, d, q)) && event(ServerRAWithoutAK(ek, d, q)).
+
+
+(* SEGMENT 5: PRE-FINISHED SERVER STATE
+   Transcript State: log_CV = (log_CRT, CertificateVerify)
+   Action: Server has produced handshake signatures but peers aren't finished. *)
+
+query pubEK:pubkey, psk:preSharedKey, cr:random, sr:random, o:params, m:params, kc:ae_key, ks:ae_key, ems:bitstring;
+    event(PreServerFinished(pubEK, psk, cr, sr, o, m, kc, ks, ems)).
+query id:identity; event(PreServerFinishedAliveness(id)).
+query idS:identity, idC:identity; event(PreServerFinishedWeakAgr(idS, idC)).
+
+
+(* SEGMENT 6: CLIENT HANDSHAKE COMPLETION
+   Transcript State: log_CFIN = (log_SFIN, ClientFinished)
+   Action: Client verifies Server Finished and generates final application keys. *)
+
+query ek:pubkey, psk:preSharedKey, cr:random, sr:random, o:params, m:params, kc:ae_key, ks:ae_key, ems:bitstring, rms:bitstring;
+    event(ClientFinished(ek, psk, cr, sr, o, m, kc, ks, ems, rms)).
+
+query id:identity; event(ClientFinishedAliveness(id)).
+query idS:identity, idC:identity; event(ClientFinishedWeakAgr(idS, idC)).
+
+query id:identity, ltk:pubkey, ak:pubkey, psk:preSharedKey, cr:random, sr:random, o:params, m:params, kc:ae_key, ks:ae_key, ems:bitstring, rms:bitstring;
+    event(ClientFinishedWithID(id, ltk, ak, psk, cr, sr, o, m, kc, ks, ems, rms)).
+
+
+(* SEGMENT 7: TLS CORE AGREEMENT (ONE-WAY)
+   Action: Standard TLS 1.3 parameter agreement checks. *)
+
+query id:identity; 
+    event(ClientFinishedAliveness(id)) && event(PreServerFinishedAliveness(id)).
+
+query id:identity, ltk:pubkey, psk:preSharedKey, o:params, m:params, kc:ae_key, ks:ae_key, ems:bitstring, rms:bitstring;
+    event(ClientFin1WayAgr(id, ltk, psk, o, m, kc, ks, ems, rms)) && 
+    event(PreServerFin1WayAgr(id, ltk, psk, o, m, kc, ks, ems)).
+
+query id:identity, ltk:pubkey, psk:preSharedKey, o:params, m:params, kc:ae_key, ks:ae_key, ems:bitstring, rms:bitstring, cr:random, sr:random;
+    event(ClientFinRecent1WayAgr(id, ltk, psk, o, m, kc, ks, ems, rms, cr, sr)) && 
+    event(PreServerFinRecent1WayAgr(id, ltk, psk, o, m, kc, ks, ems, cr, sr)).
+
+
+(* SEGMENT 8: TLS CORE AGREEMENT (MUTUAL/mTLS)
+   Action: Evaluation of ID_C agreement. *)
+
+query idS:identity, idC:identity; 
+    event(ClientFinishedWeakAgr(idS, idC)) && event(PreServerFinishedWeakAgr(idS, idC)).
+
+query idS:identity, idC:identity, ltk:pubkey, psk:preSharedKey, o:params, m:params, kc:ae_key, ks:ae_key, ems:bitstring, rms:bitstring;
+    event(ClientFinAgr(idS, idC, ltk, psk, o, m, kc, ks, ems, rms)) && 
+    event(PreServerFinAgr(idS, idC, ltk, psk, o, m, kc, ks, ems)).
+
+query idS:identity, idC:identity, ltk:pubkey, psk:preSharedKey, o:params, m:params, kc:ae_key, ks:ae_key, ems:bitstring, rms:bitstring, cr:random, sr:random;
+    event(ClientFinRecentAgr(idS, idC, ltk, psk, o, m, kc, ks, ems, rms, cr, sr)) && 
+    event(PreServerFinRecentAgr(idS, idC, ltk, psk, o, m, kc, ks, ems, cr, sr)).
+
+
+(* SEGMENT 9: COMPOSITE (RA+TLS) & FINAL AGREEMENT
+   Action: Final handshake state; all security parameters bound. *)
+
+query idS:identity, ltk:pubkey, psk:preSharedKey, o:params, m:params, kc:ae_key, ks:ae_key, ems:bitstring, rms:bitstring, cr:random, sr:random, pubEK:pubkey, d:bitstring;
+    event(ClientComp(idS, ltk, psk, o, m, kc, ks, ems, rms, cr, sr, pubEK, d)) && 
+    event(PreServerComp(idS, ltk, psk, o, m, kc, ks, ems, cr, sr, pubEK, d)).
+
+query cr:random, sr:random, psk:preSharedKey, ltk:pubkey, p:params, m:params, kc:ae_key, ks:ae_key, ems:bitstring, rms:bitstring;
+    event(ServerFinished(cr, sr, psk, ltk, p, m, kc, ks, ems, rms)) &&
+    event(ClientFinished(NULL_pubkey, psk, cr, sr, p, m, kc, ks, ems, rms)).
+
+
