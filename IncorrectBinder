@@ -26,5 +26,5 @@
 {"ts":"2026-01-18T09:20:26Z","level":"info","msg":"pulse policy ALLOW","role":"tunnel-client","peer":"alice-ea-seal-05b1494b"}
 ...
 docker exec fh-attester-05b1494b sh -c 'echo UNAUTHORIZED_CHANGE >> /root/.ssh/authorized_keys'
-{"msg":"TLS accept failed: IncorrectBinder","role":"tunnel-client"}
 [INFO] Tunnel terminated due to state divergence.
+[ERROR] {"msg":"TLS accept failed: IncorrectBinder","role":"tunnel-client"}
