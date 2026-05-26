@@ -1,0 +1,30 @@
+➜ test-harness ./scripts/harness.sh --transport tls
+[OK] Provisioning complete
+[INFO] Verifier lookup: 0ae3c98bbbac0d1e...
+[INFO] Attester lookup: 867bd013c1aa5d35...
+[OK] DNS records verified
+[INFO] Verifier: _facts.0ae3c98b.facts.local
+[INFO] Attester: _facts.867bd013.facts.local
+...
+[ATT-867bd013] 0.001881s - CEREMONY COMPLETE: Attestation Result received
+[ATT-867bd013] 0.001891s - SESSION FINALIZED: Handshake complete
+[VER-0ae3c98b] 0.002559s - CEREMONY COMPLETE: Evidence verification SUCCESS
+[VER-0ae3c98b] 0.003556s - Attestation Result sent to attester
+[ATT-867bd013] Attestation completed successfully
+[VER-0ae3c98b] Attestation completed successfully
+[OK] VERDICT: PASSED
+...
+>>> TELS: Verifying TELS Pulse
+[TELS-VERIFY] external_psk=true, early_data_configured=true, early_data_requested=true, was_rejected=false
+[TELS-VERIFY] ACCEPTING early data (max_size=16384)
+[TELS-VERIFY] Connected to tunnel egress alice-app-05b1494b:9999
+[TELS-VERIFY] Starting TELS tunnel (session=tels-84d818c6-c350-4853-b52b-549b4784098a)
+{"ts":"2026-01-18T09:20:26Z","level":"info","msg":"drained 11 bytes of 0-RTT early data","role":"tunnel-server","session_id":"tels-84d818c6-c350-4853-b52b-549b4784098a"}
+[TELS-ATTEST] SUCCESS: Early data was accepted by server
+[TELS-ATTEST] Starting pulse driver (session=driver-tels-0rtt-98c7f7ae-c4ad-473e-92b3-51ee35595b38)
+[TELS-ATTEST] Resynchronized! Skipped 1 lost pulses (counter 1 -> 2)
+{"ts":"2026-01-18T09:20:26Z","level":"info","msg":"pulse policy ALLOW","role":"tunnel-client","peer":"alice-ea-seal-05b1494b"}
+...
+docker exec fh-attester-05b1494b sh -c 'echo UNAUTHORIZED_CHANGE >> /root/.ssh/authorized_keys'
+{"msg":"TLS accept failed: IncorrectBinder","role":"tunnel-client"}
+[INFO] Tunnel terminated due to state divergence.
