@@ -1,0 +1,1052 @@
+Linear part:
+dh_ideal(dh_ideal(G,x),y) = dh_ideal(dh_ideal(G,y),x)
+Completing equations...
+Completed equations:
+dh_ideal(dh_ideal(G,x),y) = dh_ideal(dh_ideal(G,y),x)
+Convergent part: No equation.
+Process 0 (that is, the initial process):
+{1}new privCA: privkey;
+{2}let pubCA: pubkey = pk(privCA) in
+{3}out(io, pubCA);
+(
+    {4}!
+    {5}let privCA_1: privkey = privCA in
+    {6}new ID_S: identity;
+    {7}out(io, ID_S);
+    {8}new privLTK: privkey;
+    {9}new privAK: privkey;
+    {10}let pubLTK: pubkey = pk(privLTK) in
+    {11}out(io, pubLTK);
+    {12}let pubAK: pubkey = pk(privAK) in
+    {13}out(io, pubAK);
+    {14}let CA_sig: bitstring = sign(privCA_1,(ID_S,pubLTK)) in
+    {15}let server_cert: bitstring = ((ID_S,pubLTK),CA_sig) in
+    {16}out(io, server_cert);
+    {17}insert trust_store(ID_S,pubLTK,server_cert);
+    {18}!
+    {19}new privEK: privkey;
+    {20}let pubEK: pubkey = pk(privEK) in
+    {21}out(io, pubEK);
+    {22}insert agent_keys(ID_S,privLTK,pubLTK,privAK,pubAK,privEK,pubEK)
+) | (
+    {23}!
+    {24}new ID_C: identity;
+    {25}!
+    {230}get agent_keys(ID_S_1: identity,ignored_v: privkey,ignored_v_1: pubkey,ignored_v_2: privkey,ignored_v_3: pubkey,ignored_v_4: privkey,ignored_v_5: pubkey) in
+    {229}get agent_keys(ignored_v_6: identity,ignored_v_7: privkey,ignored_v_8: pubkey,ignored_v_9: privkey,pubAK_1: pubkey,ignored_v_10: privkey,ignored_v_11: pubkey) in
+    {26}!
+    {27}let ID_C_1: identity = ID_C in
+    {28}in(io, ioffer: params);
+    {29}let nego(=aTLS,DHE_13(g: group,eee: element),hash_algo: hash_alg,ev_type: ev_typ) = ioffer in
+    {30}new x: bitstring;
+    {31}let gx: element = catch-fail(dh_exp(g,G,x)) in
+    {32}let v: bool = not-caught-fail(gx) in
+    {33}let (x_1: bitstring,gx_1: element) = (if v then (x,gx) else fail-any_type) in
+    {34}let offer: params = nego(aTLS,DHE_13(g,gx_1),hash_algo,ev_type) in
+    {35}new cr: random;
+    {36}new ar: random;
+    {37}let ch: msg = CH(cr,offer,ar) in
+    {38}let psk: preSharedKey = NoPSK in
+    {39}let salt: bitstring = zero in
+    {40}let ikm: bitstring = catch-fail(psk2b(psk)) in
+    {41}let v_1: bool = not-caught-fail(ikm) in
+    {42}let es: bitstring = catch-fail((if v_1 then hmac(StrongHash,salt,ikm) else fail-any_type)) in
+    {43}let v_2: bool = not-caught-fail(es) in
+    {44}let l: label = (if v_2 then tls13_resumption_psk_binder_key else caught-fail) in
+    {45}let m: bitstring = (if v_2 then zero else caught-fail) in
+    {46}let c: bitstring = (if v_2 then catch-fail(hash(StrongHash,m)) else caught-fail) in
+    {47}let v_3: bool = not-caught-fail(c) in
+    {48}let kb: bitstring = (if v_2 then catch-fail((if v_3 then hmac(StrongHash,es,(l,c)) else fail-any_type)) else caught-fail) in
+    {49}let v_4: bool = not-caught-fail(kb) in
+    {50}let l_1: label = (if v_4 then tls13_client_early_traffic_secret else caught-fail) in
+    {51}let c_1: bitstring = (if v_4 then catch-fail(hash(StrongHash,ch)) else caught-fail) in
+    {52}let v_5: bool = not-caught-fail(c_1) in
+    {53}let atsc0: bitstring = (if v_4 then catch-fail((if v_5 then hmac(StrongHash,es,(l_1,c_1)) else fail-any_type)) else caught-fail) in
+    {54}let v_6: bool = not-caught-fail(atsc0) in
+    {55}let l_2: label = (if v_6 then tls13_key else caught-fail) in
+    {56}let c_2: bitstring = (if v_6 then zero else caught-fail) in
+    {57}let kc0: bitstring = (if v_6 then catch-fail(hmac(StrongHash,atsc0,(l_2,c_2))) else caught-fail) in
+    {58}let v_7: bool = not-caught-fail(kc0) in
+    {59}let l_3: label = (if v_7 then tls13_early_exporter_master_secret else caught-fail) in
+    {60}let c_3: bitstring = (if v_7 then catch-fail(hash(StrongHash,ch)) else caught-fail) in
+    {61}let v_8: bool = not-caught-fail(c_3) in
+    {62}let ems0: bitstring = (if v_7 then catch-fail((if v_8 then hmac(StrongHash,es,(l_3,c_3)) else fail-any_type)) else caught-fail) in
+    {63}let v_9: bool = not-caught-fail(ems0) in
+    {64}let l_4: label = (if v_9 then user_defined else caught-fail) in
+    {65}let m_1: bitstring = (if v_9 then zero else caught-fail) in
+    {66}let c_4: bitstring = (if v_9 then catch-fail(hash(StrongHash,m_1)) else caught-fail) in
+    {67}let v_10: bool = not-caught-fail(c_4) in
+    {68}let ik0: bitstring = (if v_9 then catch-fail((if v_10 then hmac(StrongHash,ems0,(l_4,c_4)) else fail-any_type)) else caught-fail) in
+    {69}let v_11: bool = not-caught-fail(ik0) in
+    {70}let l_5: label = (if v_11 then tls13_exporter else caught-fail) in
+    {71}let c_5: bitstring = (if v_11 then catch-fail(hash(StrongHash,context_value)) else caught-fail) in
+    {72}let v_12: bool = not-caught-fail(c_5) in
+    {73}let exp0: bitstring = (if v_11 then catch-fail((if v_12 then hmac(StrongHash,ik0,(l_5,c_5)) else fail-any_type)) else caught-fail) in
+    {74}let v_13: bool = not-caught-fail(exp0) in
+    {75}let (es_1: bitstring,kb_1: mac_key,kc0_1: ae_key,exp0_1: bitstring) = (if v_2 then (if v_4 then (if v_6 then (if v_7 then (if v_9 then (if v_11 then (if v_13 then (es,kb,b2ae(kc0),exp0) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) in
+    {76}event ClientOffersHash(cr,hash_algo);
+    {77}event ClientOffersKEX(cr,DHE_13(g,gx_1));
+    {78}event ClientOffersEvType(cr,ev_type);
+    {79}out(io, ch);
+    {80}in(io, SH(sr: random,mode: params));
+    {81}let nego(=aTLS,DHE_13(=g,gy: element),shash_algo: hash_alg,sev_type: ev_typ) = mode in
+    {82}let log_SH: bitstring = (ch,SH(sr,mode)) in
+    {83}let gxy: bitstring = e2b(dh_exp(g,gy,x_1)) in
+    {84}let l_6: label = tls13_derived in
+    {85}let m_2: bitstring = zero in
+    {86}let c_6: bitstring = catch-fail(hash(StrongHash,m_2)) in
+    {87}let v_14: bool = not-caught-fail(c_6) in
+    {88}let salt1: bitstring = catch-fail((if v_14 then hmac(StrongHash,es_1,(l_6,c_6)) else fail-any_type)) in
+    {89}let v_15: bool = not-caught-fail(salt1) in
+    {90}let hs: bitstring = (if v_15 then catch-fail(hmac(StrongHash,salt1,gxy)) else caught-fail) in
+    {91}let v_16: bool = not-caught-fail(hs) in
+    {92}let l_7: label = (if v_16 then tls13_client_handshake_traffic_secret else caught-fail) in
+    {93}let c_7: bitstring = (if v_16 then catch-fail(hash(StrongHash,log_SH)) else caught-fail) in
+    {94}let v_17: bool = not-caught-fail(c_7) in
+    {95}let htsc: bitstring = (if v_16 then catch-fail((if v_17 then hmac(StrongHash,hs,(l_7,c_7)) else fail-any_type)) else caught-fail) in
+    {96}let v_18: bool = not-caught-fail(htsc) in
+    {97}let l_8: label = (if v_18 then tls13_server_handshake_traffic_secret else caught-fail) in
+    {98}let c_8: bitstring = (if v_18 then catch-fail(hash(StrongHash,log_SH)) else caught-fail) in
+    {99}let v_19: bool = not-caught-fail(c_8) in
+    {100}let htss: bitstring = (if v_18 then catch-fail((if v_19 then hmac(StrongHash,hs,(l_8,c_8)) else fail-any_type)) else caught-fail) in
+    {101}let v_20: bool = not-caught-fail(htss) in
+    {102}let l_9: label = (if v_20 then tls13_key else caught-fail) in
+    {103}let c_9: bitstring = (if v_20 then zero else caught-fail) in
+    {104}let kch: bitstring = (if v_20 then catch-fail(hmac(StrongHash,htsc,(l_9,c_9))) else caught-fail) in
+    {105}let v_21: bool = not-caught-fail(kch) in
+    {106}let l_10: label = (if v_21 then tls13_key else caught-fail) in
+    {107}let c_10: bitstring = (if v_21 then zero else caught-fail) in
+    {108}let ksh: bitstring = (if v_21 then catch-fail(hmac(StrongHash,htss,(l_10,c_10))) else caught-fail) in
+    {109}let v_22: bool = not-caught-fail(ksh) in
+    {110}let l_11: label = (if v_22 then tls13_finished else caught-fail) in
+    {111}let c_11: bitstring = (if v_22 then zero else caught-fail) in
+    {112}let kcm: bitstring = (if v_22 then catch-fail(hmac(StrongHash,htsc,(l_11,c_11))) else caught-fail) in
+    {113}let v_23: bool = not-caught-fail(kcm) in
+    {114}let l_12: label = (if v_23 then tls13_finished else caught-fail) in
+    {115}let c_12: bitstring = (if v_23 then zero else caught-fail) in
+    {116}let ksm: bitstring = (if v_23 then catch-fail(hmac(StrongHash,htss,(l_12,c_12))) else caught-fail) in
+    {117}let v_24: bool = not-caught-fail(ksm) in
+    {118}let (hs_1: bitstring,kch_1: ae_key,ksh_1: ae_key,kcm_1: mac_key,ksm_1: mac_key) = (if v_15 then (if v_16 then (if v_18 then (if v_20 then (if v_21 then (if v_22 then (if v_23 then (if v_24 then (hs,b2ae(kch),b2ae(ksh),kcm,ksm) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) in
+    {119}in(io, CRT(crt_msg: bitstring));
+    {120}let (pubEK_1: pubkey,server_cert_1: bitstring) = crt_msg in
+    {121}let (id_pub_pair: bitstring,sig1: bitstring) = server_cert_1 in
+    {122}let (=ID_S_1,pubLTK_1: pubkey) = id_pub_pair in
+    {123}if (verify(pubCA,id_pub_pair,sig1) = true) then
+    {124}let log_CRT: bitstring = (log_SH,CRT(crt_msg)) in
+    {125}in(io, CV(s_LTK: bitstring));
+    {126}if (verify(pubLTK_1,hash(shash_algo,log_CRT),s_LTK) = true) then
+    {127}let log_CV: bitstring = (log_CRT,CV(s_LTK)) in
+    {128}in(io, FIN(m1: bitstring));
+    {129}if (m1 = hmac(StrongHash,ksm_1,log_CV)) then
+    {130}let log_SFIN: bitstring = (log_CV,FIN(m1)) in
+    {131}let l_13: label = tls13_derived in
+    {132}let m_3: bitstring = zero in
+    {133}let c_13: bitstring = catch-fail(hash(StrongHash,m_3)) in
+    {134}let v_25: bool = not-caught-fail(c_13) in
+    {135}let salt2: bitstring = catch-fail((if v_25 then hmac(StrongHash,hs_1,(l_13,c_13)) else fail-any_type)) in
+    {136}let v_26: bool = not-caught-fail(salt2) in
+    {137}let ikm_1: bitstring = (if v_26 then zero else caught-fail) in
+    {138}let ms: bitstring = (if v_26 then catch-fail(hmac(StrongHash,salt2,ikm_1)) else caught-fail) in
+    {139}let v_27: bool = not-caught-fail(ms) in
+    {140}let l_14: label = (if v_27 then tls13_client_application_traffic_secret else caught-fail) in
+    {141}let c_14: bitstring = (if v_27 then catch-fail(hash(StrongHash,log_SFIN)) else caught-fail) in
+    {142}let v_28: bool = not-caught-fail(c_14) in
+    {143}let atsc: bitstring = (if v_27 then catch-fail((if v_28 then hmac(StrongHash,ms,(l_14,c_14)) else fail-any_type)) else caught-fail) in
+    {144}let v_29: bool = not-caught-fail(atsc) in
+    {145}let l_15: label = (if v_29 then tls13_server_application_traffic_secret else caught-fail) in
+    {146}let c_15: bitstring = (if v_29 then catch-fail(hash(StrongHash,log_SFIN)) else caught-fail) in
+    {147}let v_30: bool = not-caught-fail(c_15) in
+    {148}let atss: bitstring = (if v_29 then catch-fail((if v_30 then hmac(StrongHash,ms,(l_15,c_15)) else fail-any_type)) else caught-fail) in
+    {149}let v_31: bool = not-caught-fail(atss) in
+    {150}let l_16: label = (if v_31 then tls13_key else caught-fail) in
+    {151}let c_16: bitstring = (if v_31 then zero else caught-fail) in
+    {152}let kc: bitstring = (if v_31 then catch-fail(hmac(StrongHash,atsc,(l_16,c_16))) else caught-fail) in
+    {153}let v_32: bool = not-caught-fail(kc) in
+    {154}let l_17: label = (if v_32 then tls13_key else caught-fail) in
+    {155}let c_17: bitstring = (if v_32 then zero else caught-fail) in
+    {156}let ks: bitstring = (if v_32 then catch-fail(hmac(StrongHash,atss,(l_17,c_17))) else caught-fail) in
+    {157}let v_33: bool = not-caught-fail(ks) in
+    {158}let l_18: label = (if v_33 then tls13_exporter_master_secret else caught-fail) in
+    {159}let c_18: bitstring = (if v_33 then catch-fail(hash(StrongHash,log_SFIN)) else caught-fail) in
+    {160}let v_34: bool = not-caught-fail(c_18) in
+    {161}let ems: bitstring = (if v_33 then catch-fail((if v_34 then hmac(StrongHash,ms,(l_18,c_18)) else fail-any_type)) else caught-fail) in
+    {162}let v_35: bool = not-caught-fail(ems) in
+    {163}let (ms_1: bitstring,kc_1: ae_key,ks_1: ae_key,ems_1: bitstring) = (if v_26 then (if v_27 then (if v_29 then (if v_31 then (if v_32 then (if v_33 then (if v_35 then (ms,b2ae(kc),b2ae(ks),ems) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) in
+    {164}let m2: bitstring = hmac(StrongHash,kcm_1,log_SFIN) in
+    {165}let log_CFIN: bitstring = (log_SFIN,FIN(m2)) in
+    {166}let l_19: label = tls13_resumption_master_secret in
+    {167}let c_19: bitstring = catch-fail(hash(StrongHash,log_CFIN)) in
+    {168}let v_36: bool = not-caught-fail(c_19) in
+    {169}let rms: bitstring = (if v_36 then hmac(StrongHash,ms_1,(l_19,c_19)) else fail-any_type) in
+    {170}event ClientFinishedAliveness(ID_S_1);
+    {171}event ClientFinishedWeakAgr(ID_S_1,ID_C_1);
+    {172}event ClientFinAgr(ID_S_1,ID_C_1,pubLTK_1,psk,offer,mode,kc_1,ks_1,ems_1,rms);
+    {173}event ClientFin1WayAgr(ID_S_1,pubLTK_1,psk,offer,mode,kc_1,ks_1,ems_1,rms);
+    {174}event ClientFinRecent1WayAgr(ID_S_1,pubLTK_1,psk,offer,mode,kc_1,ks_1,ems_1,rms,cr,sr);
+    {175}event ClientFinRecentAgr(ID_S_1,ID_C_1,pubLTK_1,psk,offer,mode,kc_1,ks_1,ems_1,rms,cr,sr);
+    {176}event ClientID(ID_S_1,gxy);
+    {177}event ClientFinished(pubLTK_1,psk,cr,sr,offer,mode,kc_1,ks_1,ems_1,rms);
+    {178}out(io, FIN(m2));
+    {179}let cr_1: random = cr in
+    {180}new req_ctx: bitstring;
+    {181}let req_msg: msg = AuthenticatorRequest(req_ctx) in
+    {182}out(io, AuthFrame(ALTA_magic,auth_request,req_msg));
+    {183}in(io, ea_frame: bitstring);
+    {184}let AuthFrame(=ALTA_magic,=authenticator,ea_bundle: msg) = ea_frame in
+    {185}let AuthenticatorResponse(CRT(ea_cert: bitstring),CV(ea_sg: bitstring),FIN(ea_mac: bitstring)) = ea_bundle in
+    {186}let (server_cert_2: bitstring,quote: bitstring) = ea_cert in
+    {187}let (dataSign: bitstring,sig: bitstring) = quote in
+    {188}let (rdata: bitstring,dev_status1: bitstring) = dataSign in
+    {189}let (id_pub_pair_1: bitstring,sig1_1: bitstring) = server_cert_2 in
+    {190}let (=ID_S_1,=pubLTK_1) = id_pub_pair_1 in
+    {191}if (verify(pubCA,id_pub_pair_1,sig1_1) = true) then
+    {192}if (verify(pubAK_1,dataSign,sig) = true) then
+    {193}if (dev_status1 = dev_statusRef) then
+    {194}event EvidenceConveyed(ID_S_1,pubAK_1,pubLTK_1,rdata,dev_status1,req_ctx);
+    {195}let l_20: label = expat_attestation in
+    {196}let c_20: bitstring = req_ctx in
+    {197}let exported_val: bitstring = hmac(StrongHash,ems_1,(l_20,c_20)) in
+    {198}let aik_pub_hash: bitstring = hash(StrongHash,(pubLTK_1,pubEK_1)) in
+    {199}if (rdata = hash(StrongHash,(aik_pub_hash,exported_val))) then
+    {200}let l_21: label = ea_server_hs_context in
+    {201}let c_21: bitstring = zero in
+    {202}let ea_hs_ctx: bitstring = hmac(StrongHash,ems_1,(l_21,c_21)) in
+    {203}let log_EA_CRT: bitstring = (ea_hs_ctx,req_msg,CRT(ea_cert)) in
+    {204}if (verify(pubLTK_1,hash(shash_algo,(ea_cv_context,log_EA_CRT)),ea_sg) = true) then
+    {205}event Accepted(quote);
+    {206}event Appraised(ea_hs_ctx);
+    {207}event AcceptedRdata(dev_status1);
+    {208}event AcceptedWithPubEK(quote,pubEK_1);
+    {209}let log_EA_CV: bitstring = (log_EA_CRT,CV(ea_sg)) in
+    {210}let l_22: label = ea_server_fin_key in
+    {211}let c_22: bitstring = zero in
+    {212}let ea_fin: bitstring = hmac(StrongHash,ems_1,(l_22,c_22)) in
+    {213}if (ea_mac = hmac(StrongHash,ea_fin,log_EA_CV)) then
+    {214}event ClientConn(quote);
+    {215}event ClientRA(pubAK_1,pubEK_1,dev_status1,quote);
+    {216}event ClientRA2(pubAK_1,pubEK_1,dev_status1);
+    {217}event ClientRA3(pubAK_1,pubEK_1,dev_status1,ID_S_1);
+    {218}event ClientRAWithoutAK(pubEK_1,dev_status1,quote);
+    {219}event ClientRANew(NULL_ID,NULL_pubkey,pubAK_1,pubEK_1,dev_status1,quote);
+    {220}event ClientStateEvKc(quote,kc_1);
+    {221}event ClientStateEvKch(quote,kch_1);
+    {222}event ClientStateEv(quote,gxy);
+    {223}event EAClientFinishedWithID(ID_S_1,pubLTK_1,pubAK_1,psk,cr_1,sr,offer,mode,kc_1,ks_1,ems_1,rms);
+    {224}event EAClientFinished(pubEK_1,psk,cr_1,sr,offer,mode,kc_1,ks_1,ems_1,rms);
+    {225}event EAClientComp(ID_S_1,pubLTK_1,psk,offer,mode,kc_1,ks_1,ems_1,rms,cr_1,sr,pubEK_1,dev_status1);
+    {226}in(io, app_msg_enc: bitstring);
+    {227}let app_msg_s: bitstring = ph_read(app_msg_enc,ks_1) in
+    {228}event ClientReceivesAppData(ID_S_1,pubLTK_1,pubEK_1,pubAK_1,cr_1,sr,req_ctx,ems_1,ks_1,kc_1,dev_status1,app_msg_s)
+) | (
+    {231}!
+    {433}get agent_keys(ID_S_2: identity,ignored_v_12: privkey,ignored_v_13: pubkey,ignored_v_14: privkey,ignored_v_15: pubkey,ignored_v_16: privkey,ignored_v_17: pubkey) in
+    {432}get agent_keys(ignored_v_18: identity,privLTK_1: privkey,pubLTK_2: pubkey,ignored_v_19: privkey,ignored_v_20: pubkey,ignored_v_21: privkey,ignored_v_22: pubkey) in
+    {431}get agent_keys(ignored_v_23: identity,ignored_v_24: privkey,ignored_v_25: pubkey,privAK_1: privkey,pubAK_2: pubkey,ignored_v_26: privkey,ignored_v_27: pubkey) in
+    {430}get agent_keys(ignored_v_28: identity,ignored_v_29: privkey,ignored_v_30: pubkey,ignored_v_31: privkey,ignored_v_32: pubkey,privEK_1: privkey,pubEK_2: pubkey) in
+    {429}get trust_store(=ID_S_2,ignored_v_33: pubkey,server_cert_3: bitstring) in
+    {232}!
+    {233}let ID_C_2: identity = NULL_ID in
+    {234}in(io, ch_1: msg);
+    {235}let CH(cr_2: random,offer_1: params,ar_1: random) = ch_1 in
+    {236}let nego(=aTLS,DHE_13(g_1: group,gx_2: element),xhash_algo: hash_alg,xev_type: ev_typ) = offer_1 in
+    {237}let psk_1: preSharedKey = NoPSK in
+    {238}let salt_1: bitstring = zero in
+    {239}let ikm_2: bitstring = catch-fail(psk2b(psk_1)) in
+    {240}let v_37: bool = not-caught-fail(ikm_2) in
+    {241}let es_2: bitstring = catch-fail((if v_37 then hmac(StrongHash,salt_1,ikm_2) else fail-any_type)) in
+    {242}let v_38: bool = not-caught-fail(es_2) in
+    {243}let l_23: label = (if v_38 then tls13_resumption_psk_binder_key else caught-fail) in
+    {244}let m_4: bitstring = (if v_38 then zero else caught-fail) in
+    {245}let c_23: bitstring = (if v_38 then catch-fail(hash(StrongHash,m_4)) else caught-fail) in
+    {246}let v_39: bool = not-caught-fail(c_23) in
+    {247}let kb_2: bitstring = (if v_38 then catch-fail((if v_39 then hmac(StrongHash,es_2,(l_23,c_23)) else fail-any_type)) else caught-fail) in
+    {248}let v_40: bool = not-caught-fail(kb_2) in
+    {249}let l_24: label = (if v_40 then tls13_client_early_traffic_secret else caught-fail) in
+    {250}let c_24: bitstring = (if v_40 then catch-fail(hash(StrongHash,ch_1)) else caught-fail) in
+    {251}let v_41: bool = not-caught-fail(c_24) in
+    {252}let atsc0_1: bitstring = (if v_40 then catch-fail((if v_41 then hmac(StrongHash,es_2,(l_24,c_24)) else fail-any_type)) else caught-fail) in
+    {253}let v_42: bool = not-caught-fail(atsc0_1) in
+    {254}let l_25: label = (if v_42 then tls13_key else caught-fail) in
+    {255}let c_25: bitstring = (if v_42 then zero else caught-fail) in
+    {256}let kc0_2: bitstring = (if v_42 then catch-fail(hmac(StrongHash,atsc0_1,(l_25,c_25))) else caught-fail) in
+    {257}let v_43: bool = not-caught-fail(kc0_2) in
+    {258}let l_26: label = (if v_43 then tls13_early_exporter_master_secret else caught-fail) in
+    {259}let c_26: bitstring = (if v_43 then catch-fail(hash(StrongHash,ch_1)) else caught-fail) in
+    {260}let v_44: bool = not-caught-fail(c_26) in
+    {261}let ems0_1: bitstring = (if v_43 then catch-fail((if v_44 then hmac(StrongHash,es_2,(l_26,c_26)) else fail-any_type)) else caught-fail) in
+    {262}let v_45: bool = not-caught-fail(ems0_1) in
+    {263}let l_27: label = (if v_45 then user_defined else caught-fail) in
+    {264}let m_5: bitstring = (if v_45 then zero else caught-fail) in
+    {265}let c_27: bitstring = (if v_45 then catch-fail(hash(StrongHash,m_5)) else caught-fail) in
+    {266}let v_46: bool = not-caught-fail(c_27) in
+    {267}let ik0_1: bitstring = (if v_45 then catch-fail((if v_46 then hmac(StrongHash,ems0_1,(l_27,c_27)) else fail-any_type)) else caught-fail) in
+    {268}let v_47: bool = not-caught-fail(ik0_1) in
+    {269}let l_28: label = (if v_47 then tls13_exporter else caught-fail) in
+    {270}let c_28: bitstring = (if v_47 then catch-fail(hash(StrongHash,context_value)) else caught-fail) in
+    {271}let v_48: bool = not-caught-fail(c_28) in
+    {272}let exp0_2: bitstring = (if v_47 then catch-fail((if v_48 then hmac(StrongHash,ik0_1,(l_28,c_28)) else fail-any_type)) else caught-fail) in
+    {273}let v_49: bool = not-caught-fail(exp0_2) in
+    {274}let (es_3: bitstring,kb_3: mac_key,kc0_3: ae_key,exp0_3: bitstring) = (if v_38 then (if v_40 then (if v_42 then (if v_43 then (if v_45 then (if v_47 then (if v_49 then (es_2,kb_2,b2ae(kc0_2),exp0_2) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) in
+    {275}new sr_1: random;
+    {276}in(io, smode: params);
+    {277}let nego(=aTLS,DHE_13(=g_1,eee_1: element),hash_algo_1: hash_alg,ev_type_1: ev_typ) = smode in
+    {278}new x_2: bitstring;
+    {279}let gx_3: element = catch-fail(dh_exp(g_1,G,x_2)) in
+    {280}let v_50: bool = not-caught-fail(gx_3) in
+    {281}let (y: bitstring,gy_1: element) = (if v_50 then (x_2,gx_3) else fail-any_type) in
+    {282}let mode_1: params = nego(aTLS,DHE_13(g_1,gy_1),hash_algo_1,ev_type_1) in
+    {283}out(io, SH(sr_1,mode_1));
+    {284}let log_SH_1: bitstring = (ch_1,SH(sr_1,mode_1)) in
+    {285}event ServerChoosesKEX(cr_2,sr_1,DHE_13(g_1,gy_1));
+    {286}event ServerChoosesHash(cr_2,sr_1,hash_algo_1);
+    {287}event ServerChoosesATLS(cr_2,sr_1,aTLS);
+    {288}event ServerChoosesEvType(cr_2,sr_1,ev_type_1);
+    {289}let gxy_1: bitstring = e2b(dh_exp(g_1,gx_2,y)) in
+    {290}let l_29: label = tls13_derived in
+    {291}let m_6: bitstring = zero in
+    {292}let c_29: bitstring = catch-fail(hash(StrongHash,m_6)) in
+    {293}let v_51: bool = not-caught-fail(c_29) in
+    {294}let salt1_1: bitstring = catch-fail((if v_51 then hmac(StrongHash,es_3,(l_29,c_29)) else fail-any_type)) in
+    {295}let v_52: bool = not-caught-fail(salt1_1) in
+    {296}let hs_2: bitstring = (if v_52 then catch-fail(hmac(StrongHash,salt1_1,gxy_1)) else caught-fail) in
+    {297}let v_53: bool = not-caught-fail(hs_2) in
+    {298}let l_30: label = (if v_53 then tls13_client_handshake_traffic_secret else caught-fail) in
+    {299}let c_30: bitstring = (if v_53 then catch-fail(hash(StrongHash,log_SH_1)) else caught-fail) in
+    {300}let v_54: bool = not-caught-fail(c_30) in
+    {301}let htsc_1: bitstring = (if v_53 then catch-fail((if v_54 then hmac(StrongHash,hs_2,(l_30,c_30)) else fail-any_type)) else caught-fail) in
+    {302}let v_55: bool = not-caught-fail(htsc_1) in
+    {303}let l_31: label = (if v_55 then tls13_server_handshake_traffic_secret else caught-fail) in
+    {304}let c_31: bitstring = (if v_55 then catch-fail(hash(StrongHash,log_SH_1)) else caught-fail) in
+    {305}let v_56: bool = not-caught-fail(c_31) in
+    {306}let htss_1: bitstring = (if v_55 then catch-fail((if v_56 then hmac(StrongHash,hs_2,(l_31,c_31)) else fail-any_type)) else caught-fail) in
+    {307}let v_57: bool = not-caught-fail(htss_1) in
+    {308}let l_32: label = (if v_57 then tls13_key else caught-fail) in
+    {309}let c_32: bitstring = (if v_57 then zero else caught-fail) in
+    {310}let kch_2: bitstring = (if v_57 then catch-fail(hmac(StrongHash,htsc_1,(l_32,c_32))) else caught-fail) in
+    {311}let v_58: bool = not-caught-fail(kch_2) in
+    {312}let l_33: label = (if v_58 then tls13_key else caught-fail) in
+    {313}let c_33: bitstring = (if v_58 then zero else caught-fail) in
+    {314}let ksh_2: bitstring = (if v_58 then catch-fail(hmac(StrongHash,htss_1,(l_33,c_33))) else caught-fail) in
+    {315}let v_59: bool = not-caught-fail(ksh_2) in
+    {316}let l_34: label = (if v_59 then tls13_finished else caught-fail) in
+    {317}let c_34: bitstring = (if v_59 then zero else caught-fail) in
+    {318}let kcm_2: bitstring = (if v_59 then catch-fail(hmac(StrongHash,htsc_1,(l_34,c_34))) else caught-fail) in
+    {319}let v_60: bool = not-caught-fail(kcm_2) in
+    {320}let l_35: label = (if v_60 then tls13_finished else caught-fail) in
+    {321}let c_35: bitstring = (if v_60 then zero else caught-fail) in
+    {322}let ksm_2: bitstring = (if v_60 then catch-fail(hmac(StrongHash,htss_1,(l_35,c_35))) else caught-fail) in
+    {323}let v_61: bool = not-caught-fail(ksm_2) in
+    {324}let (hs_3: bitstring,kch_3: ae_key,ksh_3: ae_key,kcm_3: mac_key,ksm_3: mac_key) = (if v_52 then (if v_53 then (if v_55 then (if v_57 then (if v_58 then (if v_59 then (if v_60 then (if v_61 then (hs_2,b2ae(kch_2),b2ae(ksh_2),kcm_2,ksm_2) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) in
+    {325}let pubEK_3: pubkey = pk(privEK_1) in
+    {326}let pubLTK_3: pubkey = pk(privLTK_1) in
+    {327}let pubAK_3: pubkey = pk(privAK_1) in
+    {328}event ServerID(ID_S_2,gxy_1);
+    {329}let crt_msg_1: bitstring = (pubEK_3,server_cert_3) in
+    {330}out(io, CRT(crt_msg_1));
+    {331}let log_CRT_1: bitstring = (log_SH_1,CRT(crt_msg_1)) in
+    {332}let sg_LTK: bitstring = sign(privLTK_1,hash(hash_algo_1,log_CRT_1)) in
+    {333}out(io, CV(sg_LTK));
+    {334}let log_CV_1: bitstring = (log_CRT_1,CV(sg_LTK)) in
+    {335}let m1_1: bitstring = hmac(StrongHash,ksm_3,log_CV_1) in
+    {336}let log_SFIN_1: bitstring = (log_CV_1,FIN(m1_1)) in
+    {337}let l_36: label = tls13_derived in
+    {338}let m_7: bitstring = zero in
+    {339}let c_36: bitstring = catch-fail(hash(StrongHash,m_7)) in
+    {340}let v_62: bool = not-caught-fail(c_36) in
+    {341}let salt2_1: bitstring = catch-fail((if v_62 then hmac(StrongHash,hs_3,(l_36,c_36)) else fail-any_type)) in
+    {342}let v_63: bool = not-caught-fail(salt2_1) in
+    {343}let ikm_3: bitstring = (if v_63 then zero else caught-fail) in
+    {344}let ms_2: bitstring = (if v_63 then catch-fail(hmac(StrongHash,salt2_1,ikm_3)) else caught-fail) in
+    {345}let v_64: bool = not-caught-fail(ms_2) in
+    {346}let l_37: label = (if v_64 then tls13_client_application_traffic_secret else caught-fail) in
+    {347}let c_37: bitstring = (if v_64 then catch-fail(hash(StrongHash,log_SFIN_1)) else caught-fail) in
+    {348}let v_65: bool = not-caught-fail(c_37) in
+    {349}let atsc_1: bitstring = (if v_64 then catch-fail((if v_65 then hmac(StrongHash,ms_2,(l_37,c_37)) else fail-any_type)) else caught-fail) in
+    {350}let v_66: bool = not-caught-fail(atsc_1) in
+    {351}let l_38: label = (if v_66 then tls13_server_application_traffic_secret else caught-fail) in
+    {352}let c_38: bitstring = (if v_66 then catch-fail(hash(StrongHash,log_SFIN_1)) else caught-fail) in
+    {353}let v_67: bool = not-caught-fail(c_38) in
+    {354}let atss_1: bitstring = (if v_66 then catch-fail((if v_67 then hmac(StrongHash,ms_2,(l_38,c_38)) else fail-any_type)) else caught-fail) in
+    {355}let v_68: bool = not-caught-fail(atss_1) in
+    {356}let l_39: label = (if v_68 then tls13_key else caught-fail) in
+    {357}let c_39: bitstring = (if v_68 then zero else caught-fail) in
+    {358}let kc_2: bitstring = (if v_68 then catch-fail(hmac(StrongHash,atsc_1,(l_39,c_39))) else caught-fail) in
+    {359}let v_69: bool = not-caught-fail(kc_2) in
+    {360}let l_40: label = (if v_69 then tls13_key else caught-fail) in
+    {361}let c_40: bitstring = (if v_69 then zero else caught-fail) in
+    {362}let ks_2: bitstring = (if v_69 then catch-fail(hmac(StrongHash,atss_1,(l_40,c_40))) else caught-fail) in
+    {363}let v_70: bool = not-caught-fail(ks_2) in
+    {364}let l_41: label = (if v_70 then tls13_exporter_master_secret else caught-fail) in
+    {365}let c_41: bitstring = (if v_70 then catch-fail(hash(StrongHash,log_SFIN_1)) else caught-fail) in
+    {366}let v_71: bool = not-caught-fail(c_41) in
+    {367}let ems_2: bitstring = (if v_70 then catch-fail((if v_71 then hmac(StrongHash,ms_2,(l_41,c_41)) else fail-any_type)) else caught-fail) in
+    {368}let v_72: bool = not-caught-fail(ems_2) in
+    {369}let (ms_3: bitstring,kc_3: ae_key,ks_3: ae_key,ems_3: bitstring) = (if v_63 then (if v_64 then (if v_66 then (if v_68 then (if v_69 then (if v_70 then (if v_72 then (ms_2,b2ae(kc_2),b2ae(ks_2),ems_2) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) in
+    {370}event PreServerFinishedAliveness(ID_S_2);
+    {371}event PreServerFinishedWeakAgr(ID_S_2,ID_C_2);
+    {372}event PreServerFin1WayAgr(ID_S_2,pubLTK_3,psk_1,offer_1,mode_1,kc_3,ks_3,ems_3);
+    {373}event PreServerFinRecent1WayAgr(ID_S_2,pubLTK_3,psk_1,offer_1,mode_1,kc_3,ks_3,ems_3,cr_2,sr_1);
+    {374}event PreServerFinAgr(ID_S_2,ID_C_2,pubLTK_3,psk_1,offer_1,mode_1,kc_3,ks_3,ems_3);
+    {375}event PreServerFinRecentAgr(ID_S_2,ID_C_2,pubLTK_3,psk_1,offer_1,mode_1,kc_3,ks_3,ems_3,cr_2,sr_1);
+    {376}out(io, FIN(m1_1));
+    {377}in(io, FIN(m2_1: bitstring));
+    {378}if (m2_1 = hmac(StrongHash,kcm_3,log_SFIN_1)) then
+    {379}let log_CFIN_1: bitstring = (log_SFIN_1,FIN(m2_1)) in
+    {380}let l_42: label = tls13_resumption_master_secret in
+    {381}let c_42: bitstring = catch-fail(hash(StrongHash,log_CFIN_1)) in
+    {382}let v_73: bool = not-caught-fail(c_42) in
+    {383}let rms_1: bitstring = (if v_73 then hmac(StrongHash,ms_3,(l_42,c_42)) else fail-any_type) in
+    {384}event ServerFinished(pubLTK_3,psk_1,cr_2,sr_1,offer_1,mode_1,kc_3,ks_3,ems_3,rms_1);
+    {385}let sr_2: random = sr_1 in
+    {386}in(io, req_frame: bitstring);
+    {387}let AuthFrame(=ALTA_magic,=auth_request,req_msg_1: msg) = req_frame in
+    {388}let AuthenticatorRequest(req_ctx_1: bitstring) = req_msg_1 in
+    {389}let pubEK_4: pubkey = pk(privEK_1) in
+    {390}let pubAK_4: pubkey = pk(privAK_1) in
+    {391}let pubLTK_4: pubkey = pk(privLTK_1) in
+    {392}let l_43: label = expat_attestation in
+    {393}let exported_val_1: bitstring = hmac(StrongHash,ems_3,(l_43,req_ctx_1)) in
+    {394}let aik_pub_hash_1: bitstring = hash(StrongHash,(pubLTK_4,pubEK_4)) in
+    {395}let rdata_1: bitstring = hash(StrongHash,(aik_pub_hash_1,exported_val_1)) in
+    {396}in(io, dev_status1_1: bitstring);
+    {397}let dataSign_1: bitstring = (rdata_1,dev_status1_1) in
+    {398}event ClaimsCollected(ID_S_2,pubAK_4,pubLTK_4,rdata_1,dev_status1_1,req_ctx_1);
+    {399}let quote_1: bitstring = (dataSign_1,sign(privAK_1,dataSign_1)) in
+    {400}let ea_cert_1: bitstring = (server_cert_3,quote_1) in
+    {401}let l_44: label = ea_server_hs_context in
+    {402}let c_43: bitstring = zero in
+    {403}let ea_hs_ctx_1: bitstring = hmac(StrongHash,ems_3,(l_44,c_43)) in
+    {404}let log_EA_CRT_1: bitstring = (ea_hs_ctx_1,req_msg_1,CRT(ea_cert_1)) in
+    {405}let ea_sg_1: bitstring = sign(privLTK_1,hash(hash_algo_1,(ea_cv_context,log_EA_CRT_1))) in
+    {406}let log_EA_CV_1: bitstring = (log_EA_CRT_1,CV(ea_sg_1)) in
+    {407}let l_45: label = ea_server_fin_key in
+    {408}let c_44: bitstring = zero in
+    {409}let ea_fin_1: bitstring = hmac(StrongHash,ems_3,(l_45,c_44)) in
+    {410}let ea_mac_1: bitstring = hmac(StrongHash,ea_fin_1,log_EA_CV_1) in
+    {411}event Conveyed(ea_hs_ctx_1);
+    {412}event Sent(quote_1);
+    {413}event SentWithPubEK(quote_1,pubEK_4);
+    {414}event SentRdata(dev_status1_1);
+    {415}event ServerRA(ID_S_2,pubLTK_4,pubAK_4,pubEK_4,dev_status1_1,quote_1);
+    {416}event ServerRA2(pubAK_4,pubEK_4,dev_status1_1);
+    {417}event ServerRAWithoutAK(pubEK_4,dev_status1_1,quote_1);
+    {418}event ServerStateEvKc(quote_1,kc_3);
+    {419}event ServerStateEvKch(quote_1,kch_3);
+    {420}event ServerStateEv(quote_1,gxy_1);
+    {421}event EAServerFinishedWithID(ID_S_2,pubLTK_4,pk(privAK_1),psk_1,cr_2,sr_2,offer_1,mode_1,kc_3,ks_3,ems_3);
+    {422}event EAServerFinished(pubEK_4,psk_1,cr_2,sr_2,offer_1,mode_1,kc_3,ks_3,ems_3,rms_1);
+    {423}event EAServerComp(ID_S_2,pubLTK_4,psk_1,offer_1,mode_1,kc_3,ks_3,ems_3,cr_2,sr_2,pubEK_4,dev_status1_1);
+    {424}let ea_bundle_1: msg = AuthenticatorResponse(CRT(ea_cert_1),CV(ea_sg_1),FIN(ea_mac_1)) in
+    {425}out(io, AuthFrame(ALTA_magic,authenticator,ea_bundle_1));
+    {426}new app_msg: bitstring;
+    {427}event ServerSendsAppData(ID_S_2,pubLTK_4,pubEK_4,pubAK_4,cr_2,sr_2,req_ctx_1,ems_3,ks_3,kc_3,dev_status1_1,app_msg);
+    {428}out(io, ph_msg(app_msg,ks_3))
+) | (
+    {434}!
+    {437}get agent_keys(ignored_v_34: identity,ignored_v_35: privkey,ignored_v_36: pubkey,ignored_v_37: privkey,ignored_v_38: pubkey,privEK_2: privkey,pubEK_5: pubkey) in
+    {435}event LeakedEK(pubEK_5);
+    {436}out(io, privEK_2)
+) | (
+    {438}!
+    {442}get agent_keys(ID_S_3: identity,ignored_v_39: privkey,pubLTK_5: pubkey,privAK_2: privkey,pubAK_5: pubkey,ignored_v_40: privkey,pubEK_6: pubkey) in
+    {439}event LeakedAK(pubAK_5);
+    {440}event LeakedAK2(ID_S_3,pubLTK_5,pubAK_5,pubEK_6);
+    {441}out(io, privAK_2)
+) | (
+    {443}!
+    {446}get agent_keys(ignored_v_41: identity,privLTK_2: privkey,pubLTK_6: pubkey,ignored_v_42: privkey,ignored_v_43: pubkey,ignored_v_44: privkey,ignored_v_45: pubkey) in
+    {444}event LeakedLTK(pubLTK_6);
+    {445}out(io, privLTK_2)
+) | (
+    {447}!
+    {448}event SentBadElement;
+    {449}out(io, BadElement)
+)
+
+--  Process 1 (that is, process 0, with let moved downwards):
+{1}new privCA: privkey;
+{2}let pubCA: pubkey = pk(privCA) in
+{3}out(io, pubCA);
+(
+    {4}!
+    {6}new ID_S: identity;
+    {7}out(io, ID_S);
+    {8}new privLTK: privkey;
+    {9}new privAK: privkey;
+    {10}let pubLTK: pubkey = pk(privLTK) in
+    {11}out(io, pubLTK);
+    {12}let pubAK: pubkey = pk(privAK) in
+    {13}out(io, pubAK);
+    {5}let privCA_1: privkey = privCA in
+    {14}let CA_sig: bitstring = sign(privCA_1,(ID_S,pubLTK)) in
+    {15}let server_cert: bitstring = ((ID_S,pubLTK),CA_sig) in
+    {16}out(io, server_cert);
+    {17}insert trust_store(ID_S,pubLTK,server_cert);
+    {18}!
+    {19}new privEK: privkey;
+    {20}let pubEK: pubkey = pk(privEK) in
+    {21}out(io, pubEK);
+    {22}insert agent_keys(ID_S,privLTK,pubLTK,privAK,pubAK,privEK,pubEK)
+) | (
+    {23}!
+    {24}new ID_C: identity;
+    {25}!
+    {230}get agent_keys(ID_S_1: identity,ignored_v: privkey,ignored_v_1: pubkey,ignored_v_2: privkey,ignored_v_3: pubkey,ignored_v_4: privkey,ignored_v_5: pubkey) in
+    {229}get agent_keys(ignored_v_6: identity,ignored_v_7: privkey,ignored_v_8: pubkey,ignored_v_9: privkey,pubAK_1: pubkey,ignored_v_10: privkey,ignored_v_11: pubkey) in
+    {26}!
+    {28}in(io, ioffer: params);
+    {29}let nego(=aTLS,DHE_13(g: group,eee: element),hash_algo: hash_alg,ev_type: ev_typ) = ioffer in
+    {30}new x: bitstring;
+    {31}let gx: element = catch-fail(dh_exp(g,G,x)) in
+    {32}let v: bool = not-caught-fail(gx) in
+    {33}let (x_1: bitstring,gx_1: element) = (if v then (x,gx) else fail-any_type) in
+    {35}new cr: random;
+    {36}new ar: random;
+    {38}let psk: preSharedKey = NoPSK in
+    {40}let ikm: bitstring = catch-fail(psk2b(psk)) in
+    {41}let v_1: bool = not-caught-fail(ikm) in
+    {39}let salt: bitstring = zero in
+    {42}let es: bitstring = catch-fail((if v_1 then hmac(StrongHash,salt,ikm) else fail-any_type)) in
+    {43}let v_2: bool = not-caught-fail(es) in
+    {45}let m: bitstring = (if v_2 then zero else caught-fail) in
+    {46}let c: bitstring = (if v_2 then catch-fail(hash(StrongHash,m)) else caught-fail) in
+    {47}let v_3: bool = not-caught-fail(c) in
+    {44}let l: label = (if v_2 then tls13_resumption_psk_binder_key else caught-fail) in
+    {48}let kb: bitstring = (if v_2 then catch-fail((if v_3 then hmac(StrongHash,es,(l,c)) else fail-any_type)) else caught-fail) in
+    {49}let v_4: bool = not-caught-fail(kb) in
+    {34}let offer: params = nego(aTLS,DHE_13(g,gx_1),hash_algo,ev_type) in
+    {37}let ch: msg = CH(cr,offer,ar) in
+    {51}let c_1: bitstring = (if v_4 then catch-fail(hash(StrongHash,ch)) else caught-fail) in
+    {52}let v_5: bool = not-caught-fail(c_1) in
+    {50}let l_1: label = (if v_4 then tls13_client_early_traffic_secret else caught-fail) in
+    {53}let atsc0: bitstring = (if v_4 then catch-fail((if v_5 then hmac(StrongHash,es,(l_1,c_1)) else fail-any_type)) else caught-fail) in
+    {54}let v_6: bool = not-caught-fail(atsc0) in
+    {56}let c_2: bitstring = (if v_6 then zero else caught-fail) in
+    {55}let l_2: label = (if v_6 then tls13_key else caught-fail) in
+    {57}let kc0: bitstring = (if v_6 then catch-fail(hmac(StrongHash,atsc0,(l_2,c_2))) else caught-fail) in
+    {58}let v_7: bool = not-caught-fail(kc0) in
+    {60}let c_3: bitstring = (if v_7 then catch-fail(hash(StrongHash,ch)) else caught-fail) in
+    {61}let v_8: bool = not-caught-fail(c_3) in
+    {59}let l_3: label = (if v_7 then tls13_early_exporter_master_secret else caught-fail) in
+    {62}let ems0: bitstring = (if v_7 then catch-fail((if v_8 then hmac(StrongHash,es,(l_3,c_3)) else fail-any_type)) else caught-fail) in
+    {63}let v_9: bool = not-caught-fail(ems0) in
+    {65}let m_1: bitstring = (if v_9 then zero else caught-fail) in
+    {66}let c_4: bitstring = (if v_9 then catch-fail(hash(StrongHash,m_1)) else caught-fail) in
+    {67}let v_10: bool = not-caught-fail(c_4) in
+    {64}let l_4: label = (if v_9 then user_defined else caught-fail) in
+    {68}let ik0: bitstring = (if v_9 then catch-fail((if v_10 then hmac(StrongHash,ems0,(l_4,c_4)) else fail-any_type)) else caught-fail) in
+    {69}let v_11: bool = not-caught-fail(ik0) in
+    {71}let c_5: bitstring = (if v_11 then catch-fail(hash(StrongHash,context_value)) else caught-fail) in
+    {72}let v_12: bool = not-caught-fail(c_5) in
+    {70}let l_5: label = (if v_11 then tls13_exporter else caught-fail) in
+    {73}let exp0: bitstring = (if v_11 then catch-fail((if v_12 then hmac(StrongHash,ik0,(l_5,c_5)) else fail-any_type)) else caught-fail) in
+    {74}let v_13: bool = not-caught-fail(exp0) in
+    {75}let (es_1: bitstring,kb_1: mac_key,kc0_1: ae_key,exp0_1: bitstring) = (if v_2 then (if v_4 then (if v_6 then (if v_7 then (if v_9 then (if v_11 then (if v_13 then (es,kb,b2ae(kc0),exp0) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) in
+    {76}event ClientOffersHash(cr,hash_algo);
+    {77}event ClientOffersKEX(cr,DHE_13(g,gx_1));
+    {78}event ClientOffersEvType(cr,ev_type);
+    {79}out(io, ch);
+    {80}in(io, SH(sr: random,mode: params));
+    {81}let nego(=aTLS,DHE_13(=g,gy: element),shash_algo: hash_alg,sev_type: ev_typ) = mode in
+    {83}let gxy: bitstring = e2b(dh_exp(g,gy,x_1)) in
+    {85}let m_2: bitstring = zero in
+    {86}let c_6: bitstring = catch-fail(hash(StrongHash,m_2)) in
+    {87}let v_14: bool = not-caught-fail(c_6) in
+    {84}let l_6: label = tls13_derived in
+    {88}let salt1: bitstring = catch-fail((if v_14 then hmac(StrongHash,es_1,(l_6,c_6)) else fail-any_type)) in
+    {89}let v_15: bool = not-caught-fail(salt1) in
+    {90}let hs: bitstring = (if v_15 then catch-fail(hmac(StrongHash,salt1,gxy)) else caught-fail) in
+    {91}let v_16: bool = not-caught-fail(hs) in
+    {82}let log_SH: bitstring = (ch,SH(sr,mode)) in
+    {93}let c_7: bitstring = (if v_16 then catch-fail(hash(StrongHash,log_SH)) else caught-fail) in
+    {94}let v_17: bool = not-caught-fail(c_7) in
+    {92}let l_7: label = (if v_16 then tls13_client_handshake_traffic_secret else caught-fail) in
+    {95}let htsc: bitstring = (if v_16 then catch-fail((if v_17 then hmac(StrongHash,hs,(l_7,c_7)) else fail-any_type)) else caught-fail) in
+    {96}let v_18: bool = not-caught-fail(htsc) in
+    {98}let c_8: bitstring = (if v_18 then catch-fail(hash(StrongHash,log_SH)) else caught-fail) in
+    {99}let v_19: bool = not-caught-fail(c_8) in
+    {97}let l_8: label = (if v_18 then tls13_server_handshake_traffic_secret else caught-fail) in
+    {100}let htss: bitstring = (if v_18 then catch-fail((if v_19 then hmac(StrongHash,hs,(l_8,c_8)) else fail-any_type)) else caught-fail) in
+    {101}let v_20: bool = not-caught-fail(htss) in
+    {103}let c_9: bitstring = (if v_20 then zero else caught-fail) in
+    {102}let l_9: label = (if v_20 then tls13_key else caught-fail) in
+    {104}let kch: bitstring = (if v_20 then catch-fail(hmac(StrongHash,htsc,(l_9,c_9))) else caught-fail) in
+    {105}let v_21: bool = not-caught-fail(kch) in
+    {107}let c_10: bitstring = (if v_21 then zero else caught-fail) in
+    {106}let l_10: label = (if v_21 then tls13_key else caught-fail) in
+    {108}let ksh: bitstring = (if v_21 then catch-fail(hmac(StrongHash,htss,(l_10,c_10))) else caught-fail) in
+    {109}let v_22: bool = not-caught-fail(ksh) in
+    {111}let c_11: bitstring = (if v_22 then zero else caught-fail) in
+    {110}let l_11: label = (if v_22 then tls13_finished else caught-fail) in
+    {112}let kcm: bitstring = (if v_22 then catch-fail(hmac(StrongHash,htsc,(l_11,c_11))) else caught-fail) in
+    {113}let v_23: bool = not-caught-fail(kcm) in
+    {115}let c_12: bitstring = (if v_23 then zero else caught-fail) in
+    {114}let l_12: label = (if v_23 then tls13_finished else caught-fail) in
+    {116}let ksm: bitstring = (if v_23 then catch-fail(hmac(StrongHash,htss,(l_12,c_12))) else caught-fail) in
+    {117}let v_24: bool = not-caught-fail(ksm) in
+    {118}let (hs_1: bitstring,kch_1: ae_key,ksh_1: ae_key,kcm_1: mac_key,ksm_1: mac_key) = (if v_15 then (if v_16 then (if v_18 then (if v_20 then (if v_21 then (if v_22 then (if v_23 then (if v_24 then (hs,b2ae(kch),b2ae(ksh),kcm,ksm) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) in
+    {119}in(io, CRT(crt_msg: bitstring));
+    {120}let (pubEK_1: pubkey,server_cert_1: bitstring) = crt_msg in
+    {121}let (id_pub_pair: bitstring,sig1: bitstring) = server_cert_1 in
+    {122}let (=ID_S_1,pubLTK_1: pubkey) = id_pub_pair in
+    {123}if (verify(pubCA,id_pub_pair,sig1) = true) then
+    {125}in(io, CV(s_LTK: bitstring));
+    {124}let log_CRT: bitstring = (log_SH,CRT(crt_msg)) in
+    {126}if (verify(pubLTK_1,hash(shash_algo,log_CRT),s_LTK) = true) then
+    {128}in(io, FIN(m1: bitstring));
+    {127}let log_CV: bitstring = (log_CRT,CV(s_LTK)) in
+    {129}if (m1 = hmac(StrongHash,ksm_1,log_CV)) then
+    {132}let m_3: bitstring = zero in
+    {133}let c_13: bitstring = catch-fail(hash(StrongHash,m_3)) in
+    {134}let v_25: bool = not-caught-fail(c_13) in
+    {131}let l_13: label = tls13_derived in
+    {135}let salt2: bitstring = catch-fail((if v_25 then hmac(StrongHash,hs_1,(l_13,c_13)) else fail-any_type)) in
+    {136}let v_26: bool = not-caught-fail(salt2) in
+    {137}let ikm_1: bitstring = (if v_26 then zero else caught-fail) in
+    {138}let ms: bitstring = (if v_26 then catch-fail(hmac(StrongHash,salt2,ikm_1)) else caught-fail) in
+    {139}let v_27: bool = not-caught-fail(ms) in
+    {130}let log_SFIN: bitstring = (log_CV,FIN(m1)) in
+    {141}let c_14: bitstring = (if v_27 then catch-fail(hash(StrongHash,log_SFIN)) else caught-fail) in
+    {142}let v_28: bool = not-caught-fail(c_14) in
+    {140}let l_14: label = (if v_27 then tls13_client_application_traffic_secret else caught-fail) in
+    {143}let atsc: bitstring = (if v_27 then catch-fail((if v_28 then hmac(StrongHash,ms,(l_14,c_14)) else fail-any_type)) else caught-fail) in
+    {144}let v_29: bool = not-caught-fail(atsc) in
+    {146}let c_15: bitstring = (if v_29 then catch-fail(hash(StrongHash,log_SFIN)) else caught-fail) in
+    {147}let v_30: bool = not-caught-fail(c_15) in
+    {145}let l_15: label = (if v_29 then tls13_server_application_traffic_secret else caught-fail) in
+    {148}let atss: bitstring = (if v_29 then catch-fail((if v_30 then hmac(StrongHash,ms,(l_15,c_15)) else fail-any_type)) else caught-fail) in
+    {149}let v_31: bool = not-caught-fail(atss) in
+    {151}let c_16: bitstring = (if v_31 then zero else caught-fail) in
+    {150}let l_16: label = (if v_31 then tls13_key else caught-fail) in
+    {152}let kc: bitstring = (if v_31 then catch-fail(hmac(StrongHash,atsc,(l_16,c_16))) else caught-fail) in
+    {153}let v_32: bool = not-caught-fail(kc) in
+    {155}let c_17: bitstring = (if v_32 then zero else caught-fail) in
+    {154}let l_17: label = (if v_32 then tls13_key else caught-fail) in
+    {156}let ks: bitstring = (if v_32 then catch-fail(hmac(StrongHash,atss,(l_17,c_17))) else caught-fail) in
+    {157}let v_33: bool = not-caught-fail(ks) in
+    {159}let c_18: bitstring = (if v_33 then catch-fail(hash(StrongHash,log_SFIN)) else caught-fail) in
+    {160}let v_34: bool = not-caught-fail(c_18) in
+    {158}let l_18: label = (if v_33 then tls13_exporter_master_secret else caught-fail) in
+    {161}let ems: bitstring = (if v_33 then catch-fail((if v_34 then hmac(StrongHash,ms,(l_18,c_18)) else fail-any_type)) else caught-fail) in
+    {162}let v_35: bool = not-caught-fail(ems) in
+    {163}let (ms_1: bitstring,kc_1: ae_key,ks_1: ae_key,ems_1: bitstring) = (if v_26 then (if v_27 then (if v_29 then (if v_31 then (if v_32 then (if v_33 then (if v_35 then (ms,b2ae(kc),b2ae(ks),ems) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) in
+    {164}let m2: bitstring = hmac(StrongHash,kcm_1,log_SFIN) in
+    {165}let log_CFIN: bitstring = (log_SFIN,FIN(m2)) in
+    {167}let c_19: bitstring = catch-fail(hash(StrongHash,log_CFIN)) in
+    {168}let v_36: bool = not-caught-fail(c_19) in
+    {166}let l_19: label = tls13_resumption_master_secret in
+    {169}let rms: bitstring = (if v_36 then hmac(StrongHash,ms_1,(l_19,c_19)) else fail-any_type) in
+    {170}event ClientFinishedAliveness(ID_S_1);
+    {27}let ID_C_1: identity = ID_C in
+    {171}event ClientFinishedWeakAgr(ID_S_1,ID_C_1);
+    {172}event ClientFinAgr(ID_S_1,ID_C_1,pubLTK_1,psk,offer,mode,kc_1,ks_1,ems_1,rms);
+    {173}event ClientFin1WayAgr(ID_S_1,pubLTK_1,psk,offer,mode,kc_1,ks_1,ems_1,rms);
+    {174}event ClientFinRecent1WayAgr(ID_S_1,pubLTK_1,psk,offer,mode,kc_1,ks_1,ems_1,rms,cr,sr);
+    {175}event ClientFinRecentAgr(ID_S_1,ID_C_1,pubLTK_1,psk,offer,mode,kc_1,ks_1,ems_1,rms,cr,sr);
+    {176}event ClientID(ID_S_1,gxy);
+    {177}event ClientFinished(pubLTK_1,psk,cr,sr,offer,mode,kc_1,ks_1,ems_1,rms);
+    {178}out(io, FIN(m2));
+    {180}new req_ctx: bitstring;
+    {181}let req_msg: msg = AuthenticatorRequest(req_ctx) in
+    {182}out(io, AuthFrame(ALTA_magic,auth_request,req_msg));
+    {183}in(io, ea_frame: bitstring);
+    {184}let AuthFrame(=ALTA_magic,=authenticator,ea_bundle: msg) = ea_frame in
+    {185}let AuthenticatorResponse(CRT(ea_cert: bitstring),CV(ea_sg: bitstring),FIN(ea_mac: bitstring)) = ea_bundle in
+    {186}let (server_cert_2: bitstring,quote: bitstring) = ea_cert in
+    {187}let (dataSign: bitstring,sig: bitstring) = quote in
+    {188}let (rdata: bitstring,dev_status1: bitstring) = dataSign in
+    {189}let (id_pub_pair_1: bitstring,sig1_1: bitstring) = server_cert_2 in
+    {190}let (=ID_S_1,=pubLTK_1) = id_pub_pair_1 in
+    {191}if (verify(pubCA,id_pub_pair_1,sig1_1) = true) then
+    {192}if (verify(pubAK_1,dataSign,sig) = true) then
+    {193}if (dev_status1 = dev_statusRef) then
+    {194}event EvidenceConveyed(ID_S_1,pubAK_1,pubLTK_1,rdata,dev_status1,req_ctx);
+    {196}let c_20: bitstring = req_ctx in
+    {195}let l_20: label = expat_attestation in
+    {197}let exported_val: bitstring = hmac(StrongHash,ems_1,(l_20,c_20)) in
+    {198}let aik_pub_hash: bitstring = hash(StrongHash,(pubLTK_1,pubEK_1)) in
+    {199}if (rdata = hash(StrongHash,(aik_pub_hash,exported_val))) then
+    {201}let c_21: bitstring = zero in
+    {200}let l_21: label = ea_server_hs_context in
+    {202}let ea_hs_ctx: bitstring = hmac(StrongHash,ems_1,(l_21,c_21)) in
+    {203}let log_EA_CRT: bitstring = (ea_hs_ctx,req_msg,CRT(ea_cert)) in
+    {204}if (verify(pubLTK_1,hash(shash_algo,(ea_cv_context,log_EA_CRT)),ea_sg) = true) then
+    {205}event Accepted(quote);
+    {206}event Appraised(ea_hs_ctx);
+    {207}event AcceptedRdata(dev_status1);
+    {208}event AcceptedWithPubEK(quote,pubEK_1);
+    {211}let c_22: bitstring = zero in
+    {210}let l_22: label = ea_server_fin_key in
+    {212}let ea_fin: bitstring = hmac(StrongHash,ems_1,(l_22,c_22)) in
+    {209}let log_EA_CV: bitstring = (log_EA_CRT,CV(ea_sg)) in
+    {213}if (ea_mac = hmac(StrongHash,ea_fin,log_EA_CV)) then
+    {214}event ClientConn(quote);
+    {215}event ClientRA(pubAK_1,pubEK_1,dev_status1,quote);
+    {216}event ClientRA2(pubAK_1,pubEK_1,dev_status1);
+    {217}event ClientRA3(pubAK_1,pubEK_1,dev_status1,ID_S_1);
+    {218}event ClientRAWithoutAK(pubEK_1,dev_status1,quote);
+    {219}event ClientRANew(NULL_ID,NULL_pubkey,pubAK_1,pubEK_1,dev_status1,quote);
+    {220}event ClientStateEvKc(quote,kc_1);
+    {221}event ClientStateEvKch(quote,kch_1);
+    {222}event ClientStateEv(quote,gxy);
+    {179}let cr_1: random = cr in
+    {223}event EAClientFinishedWithID(ID_S_1,pubLTK_1,pubAK_1,psk,cr_1,sr,offer,mode,kc_1,ks_1,ems_1,rms);
+    {224}event EAClientFinished(pubEK_1,psk,cr_1,sr,offer,mode,kc_1,ks_1,ems_1,rms);
+    {225}event EAClientComp(ID_S_1,pubLTK_1,psk,offer,mode,kc_1,ks_1,ems_1,rms,cr_1,sr,pubEK_1,dev_status1);
+    {226}in(io, app_msg_enc: bitstring);
+    {227}let app_msg_s: bitstring = ph_read(app_msg_enc,ks_1) in
+    {228}event ClientReceivesAppData(ID_S_1,pubLTK_1,pubEK_1,pubAK_1,cr_1,sr,req_ctx,ems_1,ks_1,kc_1,dev_status1,app_msg_s)
+) | (
+    {231}!
+    {433}get agent_keys(ID_S_2: identity,ignored_v_12: privkey,ignored_v_13: pubkey,ignored_v_14: privkey,ignored_v_15: pubkey,ignored_v_16: privkey,ignored_v_17: pubkey) in
+    {432}get agent_keys(ignored_v_18: identity,privLTK_1: privkey,pubLTK_2: pubkey,ignored_v_19: privkey,ignored_v_20: pubkey,ignored_v_21: privkey,ignored_v_22: pubkey) in
+    {431}get agent_keys(ignored_v_23: identity,ignored_v_24: privkey,ignored_v_25: pubkey,privAK_1: privkey,pubAK_2: pubkey,ignored_v_26: privkey,ignored_v_27: pubkey) in
+    {430}get agent_keys(ignored_v_28: identity,ignored_v_29: privkey,ignored_v_30: pubkey,ignored_v_31: privkey,ignored_v_32: pubkey,privEK_1: privkey,pubEK_2: pubkey) in
+    {429}get trust_store(=ID_S_2,ignored_v_33: pubkey,server_cert_3: bitstring) in
+    {232}!
+    {234}in(io, ch_1: msg);
+    {235}let CH(cr_2: random,offer_1: params,ar_1: random) = ch_1 in
+    {236}let nego(=aTLS,DHE_13(g_1: group,gx_2: element),xhash_algo: hash_alg,xev_type: ev_typ) = offer_1 in
+    {237}let psk_1: preSharedKey = NoPSK in
+    {239}let ikm_2: bitstring = catch-fail(psk2b(psk_1)) in
+    {240}let v_37: bool = not-caught-fail(ikm_2) in
+    {238}let salt_1: bitstring = zero in
+    {241}let es_2: bitstring = catch-fail((if v_37 then hmac(StrongHash,salt_1,ikm_2) else fail-any_type)) in
+    {242}let v_38: bool = not-caught-fail(es_2) in
+    {244}let m_4: bitstring = (if v_38 then zero else caught-fail) in
+    {245}let c_23: bitstring = (if v_38 then catch-fail(hash(StrongHash,m_4)) else caught-fail) in
+    {246}let v_39: bool = not-caught-fail(c_23) in
+    {243}let l_23: label = (if v_38 then tls13_resumption_psk_binder_key else caught-fail) in
+    {247}let kb_2: bitstring = (if v_38 then catch-fail((if v_39 then hmac(StrongHash,es_2,(l_23,c_23)) else fail-any_type)) else caught-fail) in
+    {248}let v_40: bool = not-caught-fail(kb_2) in
+    {250}let c_24: bitstring = (if v_40 then catch-fail(hash(StrongHash,ch_1)) else caught-fail) in
+    {251}let v_41: bool = not-caught-fail(c_24) in
+    {249}let l_24: label = (if v_40 then tls13_client_early_traffic_secret else caught-fail) in
+    {252}let atsc0_1: bitstring = (if v_40 then catch-fail((if v_41 then hmac(StrongHash,es_2,(l_24,c_24)) else fail-any_type)) else caught-fail) in
+    {253}let v_42: bool = not-caught-fail(atsc0_1) in
+    {255}let c_25: bitstring = (if v_42 then zero else caught-fail) in
+    {254}let l_25: label = (if v_42 then tls13_key else caught-fail) in
+    {256}let kc0_2: bitstring = (if v_42 then catch-fail(hmac(StrongHash,atsc0_1,(l_25,c_25))) else caught-fail) in
+    {257}let v_43: bool = not-caught-fail(kc0_2) in
+    {259}let c_26: bitstring = (if v_43 then catch-fail(hash(StrongHash,ch_1)) else caught-fail) in
+    {260}let v_44: bool = not-caught-fail(c_26) in
+    {258}let l_26: label = (if v_43 then tls13_early_exporter_master_secret else caught-fail) in
+    {261}let ems0_1: bitstring = (if v_43 then catch-fail((if v_44 then hmac(StrongHash,es_2,(l_26,c_26)) else fail-any_type)) else caught-fail) in
+    {262}let v_45: bool = not-caught-fail(ems0_1) in
+    {264}let m_5: bitstring = (if v_45 then zero else caught-fail) in
+    {265}let c_27: bitstring = (if v_45 then catch-fail(hash(StrongHash,m_5)) else caught-fail) in
+    {266}let v_46: bool = not-caught-fail(c_27) in
+    {263}let l_27: label = (if v_45 then user_defined else caught-fail) in
+    {267}let ik0_1: bitstring = (if v_45 then catch-fail((if v_46 then hmac(StrongHash,ems0_1,(l_27,c_27)) else fail-any_type)) else caught-fail) in
+    {268}let v_47: bool = not-caught-fail(ik0_1) in
+    {270}let c_28: bitstring = (if v_47 then catch-fail(hash(StrongHash,context_value)) else caught-fail) in
+    {271}let v_48: bool = not-caught-fail(c_28) in
+    {269}let l_28: label = (if v_47 then tls13_exporter else caught-fail) in
+    {272}let exp0_2: bitstring = (if v_47 then catch-fail((if v_48 then hmac(StrongHash,ik0_1,(l_28,c_28)) else fail-any_type)) else caught-fail) in
+    {273}let v_49: bool = not-caught-fail(exp0_2) in
+    {274}let (es_3: bitstring,kb_3: mac_key,kc0_3: ae_key,exp0_3: bitstring) = (if v_38 then (if v_40 then (if v_42 then (if v_43 then (if v_45 then (if v_47 then (if v_49 then (es_2,kb_2,b2ae(kc0_2),exp0_2) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) in
+    {275}new sr_1: random;
+    {276}in(io, smode: params);
+    {277}let nego(=aTLS,DHE_13(=g_1,eee_1: element),hash_algo_1: hash_alg,ev_type_1: ev_typ) = smode in
+    {278}new x_2: bitstring;
+    {279}let gx_3: element = catch-fail(dh_exp(g_1,G,x_2)) in
+    {280}let v_50: bool = not-caught-fail(gx_3) in
+    {281}let (y: bitstring,gy_1: element) = (if v_50 then (x_2,gx_3) else fail-any_type) in
+    {282}let mode_1: params = nego(aTLS,DHE_13(g_1,gy_1),hash_algo_1,ev_type_1) in
+    {283}out(io, SH(sr_1,mode_1));
+    {285}event ServerChoosesKEX(cr_2,sr_1,DHE_13(g_1,gy_1));
+    {286}event ServerChoosesHash(cr_2,sr_1,hash_algo_1);
+    {287}event ServerChoosesATLS(cr_2,sr_1,aTLS);
+    {288}event ServerChoosesEvType(cr_2,sr_1,ev_type_1);
+    {289}let gxy_1: bitstring = e2b(dh_exp(g_1,gx_2,y)) in
+    {291}let m_6: bitstring = zero in
+    {292}let c_29: bitstring = catch-fail(hash(StrongHash,m_6)) in
+    {293}let v_51: bool = not-caught-fail(c_29) in
+    {290}let l_29: label = tls13_derived in
+    {294}let salt1_1: bitstring = catch-fail((if v_51 then hmac(StrongHash,es_3,(l_29,c_29)) else fail-any_type)) in
+    {295}let v_52: bool = not-caught-fail(salt1_1) in
+    {296}let hs_2: bitstring = (if v_52 then catch-fail(hmac(StrongHash,salt1_1,gxy_1)) else caught-fail) in
+    {297}let v_53: bool = not-caught-fail(hs_2) in
+    {284}let log_SH_1: bitstring = (ch_1,SH(sr_1,mode_1)) in
+    {299}let c_30: bitstring = (if v_53 then catch-fail(hash(StrongHash,log_SH_1)) else caught-fail) in
+    {300}let v_54: bool = not-caught-fail(c_30) in
+    {298}let l_30: label = (if v_53 then tls13_client_handshake_traffic_secret else caught-fail) in
+    {301}let htsc_1: bitstring = (if v_53 then catch-fail((if v_54 then hmac(StrongHash,hs_2,(l_30,c_30)) else fail-any_type)) else caught-fail) in
+    {302}let v_55: bool = not-caught-fail(htsc_1) in
+    {304}let c_31: bitstring = (if v_55 then catch-fail(hash(StrongHash,log_SH_1)) else caught-fail) in
+    {305}let v_56: bool = not-caught-fail(c_31) in
+    {303}let l_31: label = (if v_55 then tls13_server_handshake_traffic_secret else caught-fail) in
+    {306}let htss_1: bitstring = (if v_55 then catch-fail((if v_56 then hmac(StrongHash,hs_2,(l_31,c_31)) else fail-any_type)) else caught-fail) in
+    {307}let v_57: bool = not-caught-fail(htss_1) in
+    {309}let c_32: bitstring = (if v_57 then zero else caught-fail) in
+    {308}let l_32: label = (if v_57 then tls13_key else caught-fail) in
+    {310}let kch_2: bitstring = (if v_57 then catch-fail(hmac(StrongHash,htsc_1,(l_32,c_32))) else caught-fail) in
+    {311}let v_58: bool = not-caught-fail(kch_2) in
+    {313}let c_33: bitstring = (if v_58 then zero else caught-fail) in
+    {312}let l_33: label = (if v_58 then tls13_key else caught-fail) in
+    {314}let ksh_2: bitstring = (if v_58 then catch-fail(hmac(StrongHash,htss_1,(l_33,c_33))) else caught-fail) in
+    {315}let v_59: bool = not-caught-fail(ksh_2) in
+    {317}let c_34: bitstring = (if v_59 then zero else caught-fail) in
+    {316}let l_34: label = (if v_59 then tls13_finished else caught-fail) in
+    {318}let kcm_2: bitstring = (if v_59 then catch-fail(hmac(StrongHash,htsc_1,(l_34,c_34))) else caught-fail) in
+    {319}let v_60: bool = not-caught-fail(kcm_2) in
+    {321}let c_35: bitstring = (if v_60 then zero else caught-fail) in
+    {320}let l_35: label = (if v_60 then tls13_finished else caught-fail) in
+    {322}let ksm_2: bitstring = (if v_60 then catch-fail(hmac(StrongHash,htss_1,(l_35,c_35))) else caught-fail) in
+    {323}let v_61: bool = not-caught-fail(ksm_2) in
+    {324}let (hs_3: bitstring,kch_3: ae_key,ksh_3: ae_key,kcm_3: mac_key,ksm_3: mac_key) = (if v_52 then (if v_53 then (if v_55 then (if v_57 then (if v_58 then (if v_59 then (if v_60 then (if v_61 then (hs_2,b2ae(kch_2),b2ae(ksh_2),kcm_2,ksm_2) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) in
+    {328}event ServerID(ID_S_2,gxy_1);
+    {325}let pubEK_3: pubkey = pk(privEK_1) in
+    {329}let crt_msg_1: bitstring = (pubEK_3,server_cert_3) in
+    {330}out(io, CRT(crt_msg_1));
+    {331}let log_CRT_1: bitstring = (log_SH_1,CRT(crt_msg_1)) in
+    {332}let sg_LTK: bitstring = sign(privLTK_1,hash(hash_algo_1,log_CRT_1)) in
+    {333}out(io, CV(sg_LTK));
+    {334}let log_CV_1: bitstring = (log_CRT_1,CV(sg_LTK)) in
+    {335}let m1_1: bitstring = hmac(StrongHash,ksm_3,log_CV_1) in
+    {338}let m_7: bitstring = zero in
+    {339}let c_36: bitstring = catch-fail(hash(StrongHash,m_7)) in
+    {340}let v_62: bool = not-caught-fail(c_36) in
+    {337}let l_36: label = tls13_derived in
+    {341}let salt2_1: bitstring = catch-fail((if v_62 then hmac(StrongHash,hs_3,(l_36,c_36)) else fail-any_type)) in
+    {342}let v_63: bool = not-caught-fail(salt2_1) in
+    {343}let ikm_3: bitstring = (if v_63 then zero else caught-fail) in
+    {344}let ms_2: bitstring = (if v_63 then catch-fail(hmac(StrongHash,salt2_1,ikm_3)) else caught-fail) in
+    {345}let v_64: bool = not-caught-fail(ms_2) in
+    {336}let log_SFIN_1: bitstring = (log_CV_1,FIN(m1_1)) in
+    {347}let c_37: bitstring = (if v_64 then catch-fail(hash(StrongHash,log_SFIN_1)) else caught-fail) in
+    {348}let v_65: bool = not-caught-fail(c_37) in
+    {346}let l_37: label = (if v_64 then tls13_client_application_traffic_secret else caught-fail) in
+    {349}let atsc_1: bitstring = (if v_64 then catch-fail((if v_65 then hmac(StrongHash,ms_2,(l_37,c_37)) else fail-any_type)) else caught-fail) in
+    {350}let v_66: bool = not-caught-fail(atsc_1) in
+    {352}let c_38: bitstring = (if v_66 then catch-fail(hash(StrongHash,log_SFIN_1)) else caught-fail) in
+    {353}let v_67: bool = not-caught-fail(c_38) in
+    {351}let l_38: label = (if v_66 then tls13_server_application_traffic_secret else caught-fail) in
+    {354}let atss_1: bitstring = (if v_66 then catch-fail((if v_67 then hmac(StrongHash,ms_2,(l_38,c_38)) else fail-any_type)) else caught-fail) in
+    {355}let v_68: bool = not-caught-fail(atss_1) in
+    {357}let c_39: bitstring = (if v_68 then zero else caught-fail) in
+    {356}let l_39: label = (if v_68 then tls13_key else caught-fail) in
+    {358}let kc_2: bitstring = (if v_68 then catch-fail(hmac(StrongHash,atsc_1,(l_39,c_39))) else caught-fail) in
+    {359}let v_69: bool = not-caught-fail(kc_2) in
+    {361}let c_40: bitstring = (if v_69 then zero else caught-fail) in
+    {360}let l_40: label = (if v_69 then tls13_key else caught-fail) in
+    {362}let ks_2: bitstring = (if v_69 then catch-fail(hmac(StrongHash,atss_1,(l_40,c_40))) else caught-fail) in
+    {363}let v_70: bool = not-caught-fail(ks_2) in
+    {365}let c_41: bitstring = (if v_70 then catch-fail(hash(StrongHash,log_SFIN_1)) else caught-fail) in
+    {366}let v_71: bool = not-caught-fail(c_41) in
+    {364}let l_41: label = (if v_70 then tls13_exporter_master_secret else caught-fail) in
+    {367}let ems_2: bitstring = (if v_70 then catch-fail((if v_71 then hmac(StrongHash,ms_2,(l_41,c_41)) else fail-any_type)) else caught-fail) in
+    {368}let v_72: bool = not-caught-fail(ems_2) in
+    {369}let (ms_3: bitstring,kc_3: ae_key,ks_3: ae_key,ems_3: bitstring) = (if v_63 then (if v_64 then (if v_66 then (if v_68 then (if v_69 then (if v_70 then (if v_72 then (ms_2,b2ae(kc_2),b2ae(ks_2),ems_2) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) else fail-any_type) in
+    {370}event PreServerFinishedAliveness(ID_S_2);
+    {233}let ID_C_2: identity = NULL_ID in
+    {371}event PreServerFinishedWeakAgr(ID_S_2,ID_C_2);
+    {326}let pubLTK_3: pubkey = pk(privLTK_1) in
+    {372}event PreServerFin1WayAgr(ID_S_2,pubLTK_3,psk_1,offer_1,mode_1,kc_3,ks_3,ems_3);
+    {373}event PreServerFinRecent1WayAgr(ID_S_2,pubLTK_3,psk_1,offer_1,mode_1,kc_3,ks_3,ems_3,cr_2,sr_1);
+    {374}event PreServerFinAgr(ID_S_2,ID_C_2,pubLTK_3,psk_1,offer_1,mode_1,kc_3,ks_3,ems_3);
+    {375}event PreServerFinRecentAgr(ID_S_2,ID_C_2,pubLTK_3,psk_1,offer_1,mode_1,kc_3,ks_3,ems_3,cr_2,sr_1);
+    {376}out(io, FIN(m1_1));
+    {377}in(io, FIN(m2_1: bitstring));
+    {378}if (m2_1 = hmac(StrongHash,kcm_3,log_SFIN_1)) then
+    {379}let log_CFIN_1: bitstring = (log_SFIN_1,FIN(m2_1)) in
+    {381}let c_42: bitstring = catch-fail(hash(StrongHash,log_CFIN_1)) in
+    {382}let v_73: bool = not-caught-fail(c_42) in
+    {380}let l_42: label = tls13_resumption_master_secret in
+    {383}let rms_1: bitstring = (if v_73 then hmac(StrongHash,ms_3,(l_42,c_42)) else fail-any_type) in
+    {384}event ServerFinished(pubLTK_3,psk_1,cr_2,sr_1,offer_1,mode_1,kc_3,ks_3,ems_3,rms_1);
+    {386}in(io, req_frame: bitstring);
+    {387}let AuthFrame(=ALTA_magic,=auth_request,req_msg_1: msg) = req_frame in
+    {388}let AuthenticatorRequest(req_ctx_1: bitstring) = req_msg_1 in
+    {392}let l_43: label = expat_attestation in
+    {393}let exported_val_1: bitstring = hmac(StrongHash,ems_3,(l_43,req_ctx_1)) in
+    {391}let pubLTK_4: pubkey = pk(privLTK_1) in
+    {389}let pubEK_4: pubkey = pk(privEK_1) in
+    {394}let aik_pub_hash_1: bitstring = hash(StrongHash,(pubLTK_4,pubEK_4)) in
+    {395}let rdata_1: bitstring = hash(StrongHash,(aik_pub_hash_1,exported_val_1)) in
+    {396}in(io, dev_status1_1: bitstring);
+    {390}let pubAK_4: pubkey = pk(privAK_1) in
+    {398}event ClaimsCollected(ID_S_2,pubAK_4,pubLTK_4,rdata_1,dev_status1_1,req_ctx_1);
+    {402}let c_43: bitstring = zero in
+    {401}let l_44: label = ea_server_hs_context in
+    {403}let ea_hs_ctx_1: bitstring = hmac(StrongHash,ems_3,(l_44,c_43)) in
+    {397}let dataSign_1: bitstring = (rdata_1,dev_status1_1) in
+    {399}let quote_1: bitstring = (dataSign_1,sign(privAK_1,dataSign_1)) in
+    {400}let ea_cert_1: bitstring = (server_cert_3,quote_1) in
+    {404}let log_EA_CRT_1: bitstring = (ea_hs_ctx_1,req_msg_1,CRT(ea_cert_1)) in
+    {405}let ea_sg_1: bitstring = sign(privLTK_1,hash(hash_algo_1,(ea_cv_context,log_EA_CRT_1))) in
+    {408}let c_44: bitstring = zero in
+    {407}let l_45: label = ea_server_fin_key in
+    {409}let ea_fin_1: bitstring = hmac(StrongHash,ems_3,(l_45,c_44)) in
+    {406}let log_EA_CV_1: bitstring = (log_EA_CRT_1,CV(ea_sg_1)) in
+    {410}let ea_mac_1: bitstring = hmac(StrongHash,ea_fin_1,log_EA_CV_1) in
+    {411}event Conveyed(ea_hs_ctx_1);
+    {412}event Sent(quote_1);
+    {413}event SentWithPubEK(quote_1,pubEK_4);
+    {414}event SentRdata(dev_status1_1);
+    {415}event ServerRA(ID_S_2,pubLTK_4,pubAK_4,pubEK_4,dev_status1_1,quote_1);
+    {416}event ServerRA2(pubAK_4,pubEK_4,dev_status1_1);
+    {417}event ServerRAWithoutAK(pubEK_4,dev_status1_1,quote_1);
+    {418}event ServerStateEvKc(quote_1,kc_3);
+    {419}event ServerStateEvKch(quote_1,kch_3);
+    {420}event ServerStateEv(quote_1,gxy_1);
+    {385}let sr_2: random = sr_1 in
+    {421}event EAServerFinishedWithID(ID_S_2,pubLTK_4,pk(privAK_1),psk_1,cr_2,sr_2,offer_1,mode_1,kc_3,ks_3,ems_3);
+    {422}event EAServerFinished(pubEK_4,psk_1,cr_2,sr_2,offer_1,mode_1,kc_3,ks_3,ems_3,rms_1);
+    {423}event EAServerComp(ID_S_2,pubLTK_4,psk_1,offer_1,mode_1,kc_3,ks_3,ems_3,cr_2,sr_2,pubEK_4,dev_status1_1);
+    {424}let ea_bundle_1: msg = AuthenticatorResponse(CRT(ea_cert_1),CV(ea_sg_1),FIN(ea_mac_1)) in
+    {425}out(io, AuthFrame(ALTA_magic,authenticator,ea_bundle_1));
+    {426}new app_msg: bitstring;
+    {427}event ServerSendsAppData(ID_S_2,pubLTK_4,pubEK_4,pubAK_4,cr_2,sr_2,req_ctx_1,ems_3,ks_3,kc_3,dev_status1_1,app_msg);
+    {428}out(io, ph_msg(app_msg,ks_3))
+) | (
+    {434}!
+    {437}get agent_keys(ignored_v_34: identity,ignored_v_35: privkey,ignored_v_36: pubkey,ignored_v_37: privkey,ignored_v_38: pubkey,privEK_2: privkey,pubEK_5: pubkey) in
+    {435}event LeakedEK(pubEK_5);
+    {436}out(io, privEK_2)
+) | (
+    {438}!
+    {442}get agent_keys(ID_S_3: identity,ignored_v_39: privkey,pubLTK_5: pubkey,privAK_2: privkey,pubAK_5: pubkey,ignored_v_40: privkey,pubEK_6: pubkey) in
+    {439}event LeakedAK(pubAK_5);
+    {440}event LeakedAK2(ID_S_3,pubLTK_5,pubAK_5,pubEK_6);
+    {441}out(io, privAK_2)
+) | (
+    {443}!
+    {446}get agent_keys(ignored_v_41: identity,privLTK_2: privkey,pubLTK_6: pubkey,ignored_v_42: privkey,ignored_v_43: pubkey,ignored_v_44: privkey,ignored_v_45: pubkey) in
+    {444}event LeakedLTK(pubLTK_6);
+    {445}out(io, privLTK_2)
+) | (
+    {447}!
+    {448}event SentBadElement;
+    {449}out(io, BadElement)
+)
+
+-- Query event(ClientStateEvKc(ev,kc1)) && event(ServerStateEvKc(ev,kc2)) ==> kc1 = kc2 in process 1.
+Translating the process into Horn clauses...
+Completing...
+200 rules inserted. Base: 197 rules (90 with conclusion selected). Queue: 93 rules.
+400 rules inserted. Base: 387 rules (98 with conclusion selected). Queue: 86 rules.
+600 rules inserted. Base: 548 rules (99 with conclusion selected). Queue: 87 rules.
+800 rules inserted. Base: 635 rules (105 with conclusion selected). Queue: 99 rules.
+1000 rules inserted. Base: 715 rules (107 with conclusion selected). Queue: 133 rules.
+1200 rules inserted. Base: 814 rules (107 with conclusion selected). Queue: 136 rules.
+1400 rules inserted. Base: 900 rules (109 with conclusion selected). Queue: 159 rules.
+1600 rules inserted. Base: 987 rules (109 with conclusion selected). Queue: 112 rules.
+1800 rules inserted. Base: 1022 rules (110 with conclusion selected). Queue: 96 rules.
+2000 rules inserted. Base: 1055 rules (117 with conclusion selected). Queue: 82 rules.
+2200 rules inserted. Base: 1106 rules (121 with conclusion selected). Queue: 83 rules.
+2400 rules inserted. Base: 1111 rules (127 with conclusion selected). Queue: 88 rules.
+2600 rules inserted. Base: 1136 rules (145 with conclusion selected). Queue: 55 rules.
+2800 rules inserted. Base: 1151 rules (152 with conclusion selected). Queue: 47 rules.
+3000 rules inserted. Base: 1202 rules (169 with conclusion selected). Queue: 38 rules.
+3200 rules inserted. Base: 1227 rules (177 with conclusion selected). Queue: 23 rules.
+Starting query event(ClientStateEvKc(ev,kc1)) && event(ServerStateEvKc(ev,kc2)) ==> kc1 = kc2
+goal reachable: b-event(@p_act(@occ396_1,dev_statusRef[])) && b-event(@p_act(@occ386_1,AuthFrame(ALTA_magic,auth_request,AuthenticatorRequest(req_ctx_2)))) && b-event(@p_act(@occ80_1,SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1)))) && attacker(eee_2) && attacker(sev_type_1) && attacker(eee_3) && attacker(hash_algo_2) && attacker(ev_type_2) -> event(ClientStateEvKc(((hash_ideal((hash_ideal((pk(privLTK_3),pk(privEK_3))),hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_derived,hash_ideal(zero))),zero),(tls13_exporter_master_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))))))))),(expat_attestation,req_ctx_2)))),dev_statusRef[]),sign(privAK_3,(hash_ideal((hash_ideal((pk(privLTK_3),pk(privEK_3))),hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_derived,hash_ideal(zero))),zero),(tls13_exporter_master_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))))))))),(expat_attestation,req_ctx_2)))),dev_statusRef[]))),b2ae(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_derived,hash_ideal(zero))),zero),(tls13_client_application_traffic_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))))))))),(tls13_key,zero))))) && event(ServerStateEvKc(((hash_ideal((hash_ideal((pk(privLTK_3),pk(privEK_3))),hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_derived,hash_ideal(zero))),zero),(tls13_exporter_master_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))))))))),(expat_attestation,req_ctx_2)))),dev_statusRef[]),sign(privAK_3,(hash_ideal((hash_ideal((pk(privLTK_3),pk(privEK_3))),hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_derived,hash_ideal(zero))),zero),(tls13_exporter_master_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))))))))),(expat_attestation,req_ctx_2)))),dev_statusRef[]))),b2ae(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_derived,hash_ideal(zero))),zero),(tls13_client_application_traffic_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))))))))),(tls13_key,zero)))))
+Abbreviations:
+privLTK_3 = privLTK[!1 = @sid]
+privEK_3 = privEK[!2 = @sid_1,!1 = @sid_2]
+privEK_4 = privEK[!2 = @sid_3,!1 = @sid_4]
+privAK_3 = privAK[!1 = @sid_4]
+privLTK_4 = privLTK[!1 = @sid_4]
+ID_S_5 = ID_S[!1 = @sid_4]
+privEK_5 = privEK[!2 = @sid_5,!1 = @sid]
+privAK_4 = privAK[!1 = @sid]
+ID_S_4 = ID_S[!1 = @sid]
+cr_3 = cr[ioffer = nego(aTLS,DHE_13(StrongDH,eee_3),hash_algo_2,ev_type_2),!3 = @sid_6,ignored_v_11 = pk(privEK_4),ignored_v_10 = privEK_4,pubAK_1 = pk(privAK_3),ignored_v_9 = privAK_3,ignored_v_8 = pk(privLTK_4),ignored_v_7 = privLTK_4,ignored_v_6 = ID_S_5,ignored_v_5 = pk(privEK_5),ignored_v_4 = privEK_5,ignored_v_3 = pk(privAK_4),ignored_v_2 = privAK_4,ignored_v_1 = pk(privLTK_3),ignored_v = privLTK_3,ID_S_1 = ID_S_4,!2 = @sid_7,!1 = @sid_8]
+x_4 = x[ioffer = nego(aTLS,DHE_13(StrongDH,eee_3),hash_algo_2,ev_type_2),!3 = @sid_6,ignored_v_11 = pk(privEK_4),ignored_v_10 = privEK_4,pubAK_1 = pk(privAK_3),ignored_v_9 = privAK_3,ignored_v_8 = pk(privLTK_4),ignored_v_7 = privLTK_4,ignored_v_6 = ID_S_5,ignored_v_5 = pk(privEK_5),ignored_v_4 = privEK_5,ignored_v_3 = pk(privAK_4),ignored_v_2 = privAK_4,ignored_v_1 = pk(privLTK_3),ignored_v = privLTK_3,ID_S_1 = ID_S_4,!2 = @sid_7,!1 = @sid_8]
+ar_2 = ar[ioffer = nego(aTLS,DHE_13(StrongDH,eee_3),hash_algo_2,ev_type_2),!3 = @sid_6,ignored_v_11 = pk(privEK_4),ignored_v_10 = privEK_4,pubAK_1 = pk(privAK_3),ignored_v_9 = privAK_3,ignored_v_8 = pk(privLTK_4),ignored_v_7 = privLTK_4,ignored_v_6 = ID_S_5,ignored_v_5 = pk(privEK_5),ignored_v_4 = privEK_5,ignored_v_3 = pk(privAK_4),ignored_v_2 = privAK_4,ignored_v_1 = pk(privLTK_3),ignored_v = privLTK_3,ID_S_1 = ID_S_4,!2 = @sid_7,!1 = @sid_8]
+privAK_5 = privAK[!1 = @sid_2]
+privLTK_5 = privLTK[!1 = @sid_2]
+ID_S_6 = ID_S[!1 = @sid_2]
+privEK_6 = privEK[!2 = @sid_9,!1 = @sid_4]
+privEK_7 = privEK[!2 = @sid_10,!1 = @sid]
+privEK_8 = privEK[!2 = @sid_11,!1 = @sid]
+x_3 = x_2[smode = nego(aTLS,DHE_13(StrongDH,eee_2),WeakHash,sev_type_1),ch_1 = CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),!2 = @sid_12,server_cert_3 = ((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3)))),ignored_v_33 = pk(privLTK_3),pubEK_2 = pk(privEK_3),privEK_1 = privEK_3,ignored_v_32 = pk(privAK_5),ignored_v_31 = privAK_5,ignored_v_30 = pk(privLTK_5),ignored_v_29 = privLTK_5,ignored_v_28 = ID_S_6,ignored_v_27 = pk(privEK_6),ignored_v_26 = privEK_6,pubAK_2 = pk(privAK_3),privAK_1 = privAK_3,ignored_v_25 = pk(privLTK_4),ignored_v_24 = privLTK_4,ignored_v_23 = ID_S_5,ignored_v_22 = pk(privEK_7),ignored_v_21 = privEK_7,ignored_v_20 = pk(privAK_4),ignored_v_19 = privAK_4,pubLTK_2 = pk(privLTK_3),privLTK_1 = privLTK_3,ignored_v_18 = ID_S_4,ignored_v_17 = pk(privEK_8),ignored_v_16 = privEK_8,ignored_v_15 = pk(privAK_4),ignored_v_14 = privAK_4,ignored_v_13 = pk(privLTK_3),ignored_v_12 = privLTK_3,ID_S_2 = ID_S_4,!1 = @sid_13]
+sr_3 = sr_1[ch_1 = CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),!2 = @sid_12,server_cert_3 = ((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3)))),ignored_v_33 = pk(privLTK_3),pubEK_2 = pk(privEK_3),privEK_1 = privEK_3,ignored_v_32 = pk(privAK_5),ignored_v_31 = privAK_5,ignored_v_30 = pk(privLTK_5),ignored_v_29 = privLTK_5,ignored_v_28 = ID_S_6,ignored_v_27 = pk(privEK_6),ignored_v_26 = privEK_6,pubAK_2 = pk(privAK_3),privAK_1 = privAK_3,ignored_v_25 = pk(privLTK_4),ignored_v_24 = privLTK_4,ignored_v_23 = ID_S_5,ignored_v_22 = pk(privEK_7),ignored_v_21 = privEK_7,ignored_v_20 = pk(privAK_4),ignored_v_19 = privAK_4,pubLTK_2 = pk(privLTK_3),privLTK_1 = privLTK_3,ignored_v_18 = ID_S_4,ignored_v_17 = pk(privEK_8),ignored_v_16 = privEK_8,ignored_v_15 = pk(privAK_4),ignored_v_14 = privAK_4,ignored_v_13 = pk(privLTK_3),ignored_v_12 = privLTK_3,ID_S_2 = ID_S_4,!1 = @sid_13]
+req_ctx_2 = req_ctx[m1 = hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision)))),s_LTK = sign(privLTK_3,collision),crt_msg = (pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))),mode = nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),WeakHash,sev_type_1),sr = sr_3,ioffer = nego(aTLS,DHE_13(StrongDH,eee_3),hash_algo_2,ev_type_2),!3 = @sid_6,ignored_v_11 = pk(privEK_4),ignored_v_10 = privEK_4,pubAK_1 = pk(privAK_3),ignored_v_9 = privAK_3,ignored_v_8 = pk(privLTK_4),ignored_v_7 = privLTK_4,ignored_v_6 = ID_S_5,ignored_v_5 = pk(privEK_5),ignored_v_4 = privEK_5,ignored_v_3 = pk(privAK_4),ignored_v_2 = privAK_4,ignored_v_1 = pk(privLTK_3),ignored_v = privLTK_3,ID_S_1 = ID_S_4,!2 = @sid_7,!1 = @sid_8]
+@occ396_1 = @occ396[!2 = @sid_12,!1 = @sid_13]
+@occ386_1 = @occ386[!2 = @sid_12,!1 = @sid_13]
+@occ80_1 = @occ80[!3 = @sid_6,!2 = @sid_7,!1 = @sid_8]
+goal reachable: b-event(@p_act(@occ396_1,dev_statusRef[])) && b-event(@p_act(@occ386_1,AuthFrame(ALTA_magic,auth_request,AuthenticatorRequest(req_ctx_2)))) && b-event(@p_act(@occ80_1,SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1)))) && attacker(eee_2) && attacker(sev_type_1) && attacker(eee_3) && attacker(hash_algo_2) && attacker(ev_type_2) -> event(ClientStateEvKc(((hash_ideal((hash_ideal((pk(privLTK_3),pk(privEK_3))),hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_derived,hash_ideal(zero))),zero),(tls13_exporter_master_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))))))))),(expat_attestation,req_ctx_2)))),dev_statusRef[]),sign(privAK_3,(hash_ideal((hash_ideal((pk(privLTK_3),pk(privEK_3))),hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_derived,hash_ideal(zero))),zero),(tls13_exporter_master_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))))))))),(expat_attestation,req_ctx_2)))),dev_statusRef[]))),b2ae(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_derived,hash_ideal(zero))),zero),(tls13_client_application_traffic_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))))))))),(tls13_key,zero))))) && event(ServerStateEvKc(((hash_ideal((hash_ideal((pk(privLTK_3),pk(privEK_3))),hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_derived,hash_ideal(zero))),zero),(tls13_exporter_master_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))))))))),(expat_attestation,req_ctx_2)))),dev_statusRef[]),sign(privAK_3,(hash_ideal((hash_ideal((pk(privLTK_3),pk(privEK_3))),hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_derived,hash_ideal(zero))),zero),(tls13_exporter_master_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))))))))),(expat_attestation,req_ctx_2)))),dev_statusRef[]))),b2ae(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_derived,hash_ideal(zero))),zero),(tls13_client_application_traffic_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))))))))),(tls13_key,zero)))))
+Abbreviations:
+privLTK_3 = privLTK[!1 = @sid]
+privEK_3 = privEK[!2 = @sid_1,!1 = @sid_2]
+privEK_4 = privEK[!2 = @sid_3,!1 = @sid_4]
+privAK_3 = privAK[!1 = @sid_4]
+privLTK_4 = privLTK[!1 = @sid_4]
+ID_S_5 = ID_S[!1 = @sid_4]
+privEK_5 = privEK[!2 = @sid_5,!1 = @sid]
+privAK_4 = privAK[!1 = @sid]
+ID_S_4 = ID_S[!1 = @sid]
+cr_3 = cr[ioffer = nego(aTLS,DHE_13(StrongDH,eee_3),hash_algo_2,ev_type_2),!3 = @sid_6,ignored_v_11 = pk(privEK_4),ignored_v_10 = privEK_4,pubAK_1 = pk(privAK_3),ignored_v_9 = privAK_3,ignored_v_8 = pk(privLTK_4),ignored_v_7 = privLTK_4,ignored_v_6 = ID_S_5,ignored_v_5 = pk(privEK_5),ignored_v_4 = privEK_5,ignored_v_3 = pk(privAK_4),ignored_v_2 = privAK_4,ignored_v_1 = pk(privLTK_3),ignored_v = privLTK_3,ID_S_1 = ID_S_4,!2 = @sid_7,!1 = @sid_8]
+x_4 = x[ioffer = nego(aTLS,DHE_13(StrongDH,eee_3),hash_algo_2,ev_type_2),!3 = @sid_6,ignored_v_11 = pk(privEK_4),ignored_v_10 = privEK_4,pubAK_1 = pk(privAK_3),ignored_v_9 = privAK_3,ignored_v_8 = pk(privLTK_4),ignored_v_7 = privLTK_4,ignored_v_6 = ID_S_5,ignored_v_5 = pk(privEK_5),ignored_v_4 = privEK_5,ignored_v_3 = pk(privAK_4),ignored_v_2 = privAK_4,ignored_v_1 = pk(privLTK_3),ignored_v = privLTK_3,ID_S_1 = ID_S_4,!2 = @sid_7,!1 = @sid_8]
+ar_2 = ar[ioffer = nego(aTLS,DHE_13(StrongDH,eee_3),hash_algo_2,ev_type_2),!3 = @sid_6,ignored_v_11 = pk(privEK_4),ignored_v_10 = privEK_4,pubAK_1 = pk(privAK_3),ignored_v_9 = privAK_3,ignored_v_8 = pk(privLTK_4),ignored_v_7 = privLTK_4,ignored_v_6 = ID_S_5,ignored_v_5 = pk(privEK_5),ignored_v_4 = privEK_5,ignored_v_3 = pk(privAK_4),ignored_v_2 = privAK_4,ignored_v_1 = pk(privLTK_3),ignored_v = privLTK_3,ID_S_1 = ID_S_4,!2 = @sid_7,!1 = @sid_8]
+privAK_5 = privAK[!1 = @sid_2]
+privLTK_5 = privLTK[!1 = @sid_2]
+ID_S_6 = ID_S[!1 = @sid_2]
+privEK_6 = privEK[!2 = @sid_9,!1 = @sid_4]
+privEK_7 = privEK[!2 = @sid_10,!1 = @sid]
+privEK_8 = privEK[!2 = @sid_11,!1 = @sid]
+x_3 = x_2[smode = nego(aTLS,DHE_13(StrongDH,eee_2),StrongHash,sev_type_1),ch_1 = CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),!2 = @sid_12,server_cert_3 = ((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3)))),ignored_v_33 = pk(privLTK_3),pubEK_2 = pk(privEK_3),privEK_1 = privEK_3,ignored_v_32 = pk(privAK_5),ignored_v_31 = privAK_5,ignored_v_30 = pk(privLTK_5),ignored_v_29 = privLTK_5,ignored_v_28 = ID_S_6,ignored_v_27 = pk(privEK_6),ignored_v_26 = privEK_6,pubAK_2 = pk(privAK_3),privAK_1 = privAK_3,ignored_v_25 = pk(privLTK_4),ignored_v_24 = privLTK_4,ignored_v_23 = ID_S_5,ignored_v_22 = pk(privEK_7),ignored_v_21 = privEK_7,ignored_v_20 = pk(privAK_4),ignored_v_19 = privAK_4,pubLTK_2 = pk(privLTK_3),privLTK_1 = privLTK_3,ignored_v_18 = ID_S_4,ignored_v_17 = pk(privEK_8),ignored_v_16 = privEK_8,ignored_v_15 = pk(privAK_4),ignored_v_14 = privAK_4,ignored_v_13 = pk(privLTK_3),ignored_v_12 = privLTK_3,ID_S_2 = ID_S_4,!1 = @sid_13]
+sr_3 = sr_1[ch_1 = CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),!2 = @sid_12,server_cert_3 = ((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3)))),ignored_v_33 = pk(privLTK_3),pubEK_2 = pk(privEK_3),privEK_1 = privEK_3,ignored_v_32 = pk(privAK_5),ignored_v_31 = privAK_5,ignored_v_30 = pk(privLTK_5),ignored_v_29 = privLTK_5,ignored_v_28 = ID_S_6,ignored_v_27 = pk(privEK_6),ignored_v_26 = privEK_6,pubAK_2 = pk(privAK_3),privAK_1 = privAK_3,ignored_v_25 = pk(privLTK_4),ignored_v_24 = privLTK_4,ignored_v_23 = ID_S_5,ignored_v_22 = pk(privEK_7),ignored_v_21 = privEK_7,ignored_v_20 = pk(privAK_4),ignored_v_19 = privAK_4,pubLTK_2 = pk(privLTK_3),privLTK_1 = privLTK_3,ignored_v_18 = ID_S_4,ignored_v_17 = pk(privEK_8),ignored_v_16 = privEK_8,ignored_v_15 = pk(privAK_4),ignored_v_14 = privAK_4,ignored_v_13 = pk(privLTK_3),ignored_v_12 = privLTK_3,ID_S_2 = ID_S_4,!1 = @sid_13]
+req_ctx_2 = req_ctx[m1 = hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(dh_ideal(dh_ideal(G,x_3),x_4))),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3)))))))))))),s_LTK = sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_4)),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))),crt_msg = (pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))),mode = nego(aTLS,DHE_13(StrongDH,dh_ideal(G,x_3)),StrongHash,sev_type_1),sr = sr_3,ioffer = nego(aTLS,DHE_13(StrongDH,eee_3),hash_algo_2,ev_type_2),!3 = @sid_6,ignored_v_11 = pk(privEK_4),ignored_v_10 = privEK_4,pubAK_1 = pk(privAK_3),ignored_v_9 = privAK_3,ignored_v_8 = pk(privLTK_4),ignored_v_7 = privLTK_4,ignored_v_6 = ID_S_5,ignored_v_5 = pk(privEK_5),ignored_v_4 = privEK_5,ignored_v_3 = pk(privAK_4),ignored_v_2 = privAK_4,ignored_v_1 = pk(privLTK_3),ignored_v = privLTK_3,ID_S_1 = ID_S_4,!2 = @sid_7,!1 = @sid_8]
+@occ396_1 = @occ396[!2 = @sid_12,!1 = @sid_13]
+@occ386_1 = @occ386[!2 = @sid_12,!1 = @sid_13]
+@occ80_1 = @occ80[!3 = @sid_6,!2 = @sid_7,!1 = @sid_8]
+goal reachable: b-event(@p_act(@occ396_1,dev_statusRef[])) && b-event(@p_act(@occ80_1,SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1)))) && b-event(@p_act(@occ386_1,AuthFrame(ALTA_magic,auth_request,AuthenticatorRequest(req_ctx_2)))) && attacker(sev_type_1) && attacker(eee_2) && attacker(hash_algo_2) && attacker(ev_type_2) -> event(ClientStateEvKc(((hash_ideal((hash_ideal((pk(privLTK_3),pk(privEK_3))),hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_derived,hash_ideal(zero))),zero),(tls13_exporter_master_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))))))))),(expat_attestation,req_ctx_2)))),dev_statusRef[]),sign(privAK_3,(hash_ideal((hash_ideal((pk(privLTK_3),pk(privEK_3))),hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_derived,hash_ideal(zero))),zero),(tls13_exporter_master_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))))))))),(expat_attestation,req_ctx_2)))),dev_statusRef[]))),b2ae(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_derived,hash_ideal(zero))),zero),(tls13_client_application_traffic_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))))))))),(tls13_key,zero))))) && event(ServerStateEvKc(((hash_ideal((hash_ideal((pk(privLTK_3),pk(privEK_3))),hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_derived,hash_ideal(zero))),zero),(tls13_exporter_master_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))))))))),(expat_attestation,req_ctx_2)))),dev_statusRef[]),sign(privAK_3,(hash_ideal((hash_ideal((pk(privLTK_3),pk(privEK_3))),hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_derived,hash_ideal(zero))),zero),(tls13_exporter_master_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))))))))),(expat_attestation,req_ctx_2)))),dev_statusRef[]))),b2ae(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_derived,hash_ideal(zero))),zero),(tls13_client_application_traffic_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision))))))))),(tls13_key,zero)))))
+Abbreviations:
+privLTK_3 = privLTK[!1 = @sid]
+privEK_3 = privEK[!2 = @sid_1,!1 = @sid_2]
+privEK_4 = privEK[!2 = @sid_3,!1 = @sid_4]
+privAK_3 = privAK[!1 = @sid_4]
+privLTK_4 = privLTK[!1 = @sid_4]
+ID_S_5 = ID_S[!1 = @sid_4]
+privEK_5 = privEK[!2 = @sid_5,!1 = @sid]
+privAK_4 = privAK[!1 = @sid]
+ID_S_4 = ID_S[!1 = @sid]
+cr_3 = cr[ioffer = nego(aTLS,DHE_13(WeakDH,eee_2),hash_algo_2,ev_type_2),!3 = @sid_6,ignored_v_11 = pk(privEK_4),ignored_v_10 = privEK_4,pubAK_1 = pk(privAK_3),ignored_v_9 = privAK_3,ignored_v_8 = pk(privLTK_4),ignored_v_7 = privLTK_4,ignored_v_6 = ID_S_5,ignored_v_5 = pk(privEK_5),ignored_v_4 = privEK_5,ignored_v_3 = pk(privAK_4),ignored_v_2 = privAK_4,ignored_v_1 = pk(privLTK_3),ignored_v = privLTK_3,ID_S_1 = ID_S_4,!2 = @sid_7,!1 = @sid_8]
+ar_2 = ar[ioffer = nego(aTLS,DHE_13(WeakDH,eee_2),hash_algo_2,ev_type_2),!3 = @sid_6,ignored_v_11 = pk(privEK_4),ignored_v_10 = privEK_4,pubAK_1 = pk(privAK_3),ignored_v_9 = privAK_3,ignored_v_8 = pk(privLTK_4),ignored_v_7 = privLTK_4,ignored_v_6 = ID_S_5,ignored_v_5 = pk(privEK_5),ignored_v_4 = privEK_5,ignored_v_3 = pk(privAK_4),ignored_v_2 = privAK_4,ignored_v_1 = pk(privLTK_3),ignored_v = privLTK_3,ID_S_1 = ID_S_4,!2 = @sid_7,!1 = @sid_8]
+privAK_5 = privAK[!1 = @sid_2]
+privLTK_5 = privLTK[!1 = @sid_2]
+ID_S_6 = ID_S[!1 = @sid_2]
+privEK_6 = privEK[!2 = @sid_9,!1 = @sid_4]
+privEK_7 = privEK[!2 = @sid_10,!1 = @sid]
+privEK_8 = privEK[!2 = @sid_11,!1 = @sid]
+sr_3 = sr_1[ch_1 = CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),!2 = @sid_12,server_cert_3 = ((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3)))),ignored_v_33 = pk(privLTK_3),pubEK_2 = pk(privEK_3),privEK_1 = privEK_3,ignored_v_32 = pk(privAK_5),ignored_v_31 = privAK_5,ignored_v_30 = pk(privLTK_5),ignored_v_29 = privLTK_5,ignored_v_28 = ID_S_6,ignored_v_27 = pk(privEK_6),ignored_v_26 = privEK_6,pubAK_2 = pk(privAK_3),privAK_1 = privAK_3,ignored_v_25 = pk(privLTK_4),ignored_v_24 = privLTK_4,ignored_v_23 = ID_S_5,ignored_v_22 = pk(privEK_7),ignored_v_21 = privEK_7,ignored_v_20 = pk(privAK_4),ignored_v_19 = privAK_4,pubLTK_2 = pk(privLTK_3),privLTK_1 = privLTK_3,ignored_v_18 = ID_S_4,ignored_v_17 = pk(privEK_8),ignored_v_16 = privEK_8,ignored_v_15 = pk(privAK_4),ignored_v_14 = privAK_4,ignored_v_13 = pk(privLTK_3),ignored_v_12 = privLTK_3,ID_S_2 = ID_S_4,!1 = @sid_13]
+req_ctx_2 = req_ctx[m1 = hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,collision)))),s_LTK = sign(privLTK_3,collision),crt_msg = (pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))),mode = nego(aTLS,DHE_13(WeakDH,BadElement),WeakHash,sev_type_1),sr = sr_3,ioffer = nego(aTLS,DHE_13(WeakDH,eee_2),hash_algo_2,ev_type_2),!3 = @sid_6,ignored_v_11 = pk(privEK_4),ignored_v_10 = privEK_4,pubAK_1 = pk(privAK_3),ignored_v_9 = privAK_3,ignored_v_8 = pk(privLTK_4),ignored_v_7 = privLTK_4,ignored_v_6 = ID_S_5,ignored_v_5 = pk(privEK_5),ignored_v_4 = privEK_5,ignored_v_3 = pk(privAK_4),ignored_v_2 = privAK_4,ignored_v_1 = pk(privLTK_3),ignored_v = privLTK_3,ID_S_1 = ID_S_4,!2 = @sid_7,!1 = @sid_8]
+@occ396_1 = @occ396[!2 = @sid_12,!1 = @sid_13]
+@occ80_1 = @occ80[!3 = @sid_6,!2 = @sid_7,!1 = @sid_8]
+@occ386_1 = @occ386[!2 = @sid_12,!1 = @sid_13]
+goal reachable: b-event(@p_act(@occ396_1,dev_statusRef[])) && b-event(@p_act(@occ80_1,SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1)))) && b-event(@p_act(@occ386_1,AuthFrame(ALTA_magic,auth_request,AuthenticatorRequest(req_ctx_2)))) && attacker(sev_type_1) && attacker(eee_2) && attacker(hash_algo_2) && attacker(ev_type_2) -> event(ClientStateEvKc(((hash_ideal((hash_ideal((pk(privLTK_3),pk(privEK_3))),hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_derived,hash_ideal(zero))),zero),(tls13_exporter_master_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))))))))),(expat_attestation,req_ctx_2)))),dev_statusRef[]),sign(privAK_3,(hash_ideal((hash_ideal((pk(privLTK_3),pk(privEK_3))),hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_derived,hash_ideal(zero))),zero),(tls13_exporter_master_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))))))))),(expat_attestation,req_ctx_2)))),dev_statusRef[]))),b2ae(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_derived,hash_ideal(zero))),zero),(tls13_client_application_traffic_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))))))))),(tls13_key,zero))))) && event(ServerStateEvKc(((hash_ideal((hash_ideal((pk(privLTK_3),pk(privEK_3))),hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_derived,hash_ideal(zero))),zero),(tls13_exporter_master_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))))))))),(expat_attestation,req_ctx_2)))),dev_statusRef[]),sign(privAK_3,(hash_ideal((hash_ideal((pk(privLTK_3),pk(privEK_3))),hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_derived,hash_ideal(zero))),zero),(tls13_exporter_master_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))))))))),(expat_attestation,req_ctx_2)))),dev_statusRef[]))),b2ae(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_derived,hash_ideal(zero))),zero),(tls13_client_application_traffic_secret,hash_ideal(((((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))),FIN(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))))))))))),(tls13_key,zero)))))
+Abbreviations:
+privLTK_3 = privLTK[!1 = @sid]
+privEK_3 = privEK[!2 = @sid_1,!1 = @sid_2]
+privEK_4 = privEK[!2 = @sid_3,!1 = @sid_4]
+privAK_3 = privAK[!1 = @sid_4]
+privLTK_4 = privLTK[!1 = @sid_4]
+ID_S_5 = ID_S[!1 = @sid_4]
+privEK_5 = privEK[!2 = @sid_5,!1 = @sid]
+privAK_4 = privAK[!1 = @sid]
+ID_S_4 = ID_S[!1 = @sid]
+cr_3 = cr[ioffer = nego(aTLS,DHE_13(WeakDH,eee_2),hash_algo_2,ev_type_2),!3 = @sid_6,ignored_v_11 = pk(privEK_4),ignored_v_10 = privEK_4,pubAK_1 = pk(privAK_3),ignored_v_9 = privAK_3,ignored_v_8 = pk(privLTK_4),ignored_v_7 = privLTK_4,ignored_v_6 = ID_S_5,ignored_v_5 = pk(privEK_5),ignored_v_4 = privEK_5,ignored_v_3 = pk(privAK_4),ignored_v_2 = privAK_4,ignored_v_1 = pk(privLTK_3),ignored_v = privLTK_3,ID_S_1 = ID_S_4,!2 = @sid_7,!1 = @sid_8]
+ar_2 = ar[ioffer = nego(aTLS,DHE_13(WeakDH,eee_2),hash_algo_2,ev_type_2),!3 = @sid_6,ignored_v_11 = pk(privEK_4),ignored_v_10 = privEK_4,pubAK_1 = pk(privAK_3),ignored_v_9 = privAK_3,ignored_v_8 = pk(privLTK_4),ignored_v_7 = privLTK_4,ignored_v_6 = ID_S_5,ignored_v_5 = pk(privEK_5),ignored_v_4 = privEK_5,ignored_v_3 = pk(privAK_4),ignored_v_2 = privAK_4,ignored_v_1 = pk(privLTK_3),ignored_v = privLTK_3,ID_S_1 = ID_S_4,!2 = @sid_7,!1 = @sid_8]
+privAK_5 = privAK[!1 = @sid_2]
+privLTK_5 = privLTK[!1 = @sid_2]
+ID_S_6 = ID_S[!1 = @sid_2]
+privEK_6 = privEK[!2 = @sid_9,!1 = @sid_4]
+privEK_7 = privEK[!2 = @sid_10,!1 = @sid]
+privEK_8 = privEK[!2 = @sid_11,!1 = @sid]
+sr_3 = sr_1[ch_1 = CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),!2 = @sid_12,server_cert_3 = ((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3)))),ignored_v_33 = pk(privLTK_3),pubEK_2 = pk(privEK_3),privEK_1 = privEK_3,ignored_v_32 = pk(privAK_5),ignored_v_31 = privAK_5,ignored_v_30 = pk(privLTK_5),ignored_v_29 = privLTK_5,ignored_v_28 = ID_S_6,ignored_v_27 = pk(privEK_6),ignored_v_26 = privEK_6,pubAK_2 = pk(privAK_3),privAK_1 = privAK_3,ignored_v_25 = pk(privLTK_4),ignored_v_24 = privLTK_4,ignored_v_23 = ID_S_5,ignored_v_22 = pk(privEK_7),ignored_v_21 = privEK_7,ignored_v_20 = pk(privAK_4),ignored_v_19 = privAK_4,pubLTK_2 = pk(privLTK_3),privLTK_1 = privLTK_3,ignored_v_18 = ID_S_4,ignored_v_17 = pk(privEK_8),ignored_v_16 = privEK_8,ignored_v_15 = pk(privAK_4),ignored_v_14 = privAK_4,ignored_v_13 = pk(privLTK_3),ignored_v_12 = privLTK_3,ID_S_2 = ID_S_4,!1 = @sid_13]
+req_ctx_2 = req_ctx[m1 = hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(hmac_ideal(zero,zero),(tls13_derived,hash_ideal(zero))),e2b(BadElement)),(tls13_server_handshake_traffic_secret,hash_ideal((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1)))))),(tls13_finished,zero)),(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))),CV(sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3)))))))))))),s_LTK = sign(privLTK_3,hash_ideal(((CH(cr_3,nego(aTLS,DHE_13(WeakDH,BadElement),hash_algo_2,ev_type_2),ar_2),SH(sr_3,nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1))),CRT((pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))))))),crt_msg = (pk(privEK_3),((ID_S_4,pk(privLTK_3)),sign(privCA[],(ID_S_4,pk(privLTK_3))))),mode = nego(aTLS,DHE_13(WeakDH,BadElement),StrongHash,sev_type_1),sr = sr_3,ioffer = nego(aTLS,DHE_13(WeakDH,eee_2),hash_algo_2,ev_type_2),!3 = @sid_6,ignored_v_11 = pk(privEK_4),ignored_v_10 = privEK_4,pubAK_1 = pk(privAK_3),ignored_v_9 = privAK_3,ignored_v_8 = pk(privLTK_4),ignored_v_7 = privLTK_4,ignored_v_6 = ID_S_5,ignored_v_5 = pk(privEK_5),ignored_v_4 = privEK_5,ignored_v_3 = pk(privAK_4),ignored_v_2 = privAK_4,ignored_v_1 = pk(privLTK_3),ignored_v = privLTK_3,ID_S_1 = ID_S_4,!2 = @sid_7,!1 = @sid_8]
+@occ396_1 = @occ396[!2 = @sid_12,!1 = @sid_13]
+@occ80_1 = @occ80[!3 = @sid_6,!2 = @sid_7,!1 = @sid_8]
+@occ386_1 = @occ386[!2 = @sid_12,!1 = @sid_13]
+RESULT event(ClientStateEvKc(ev,kc1)) && event(ServerStateEvKc(ev,kc2)) ==> kc1 = kc2 is true.
+
+--------------------------------------------------------------
+Verification summary:
+
+Query event(ClientStateEvKc(ev,kc1)) && event(ServerStateEvKc(ev,kc2)) ==> kc1 = kc2 is true.
+
+--------------------------------------------------------------
+
